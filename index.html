@@ -24,108 +24,136 @@
     </div>
 
     <script>
-        const n8nUploadWebhook = "https://jarvis.tailc9769c.ts.net:8443/webhook-test/upload-audio"; // Replace with your Tailscale IP
-        
-        let audioContext, analyser, microphone, mediaRecorder;
-        let audioChunks = [];
-        let isSpeaking = false;
-        let speechTimer = null;
-        let lastSpeechTime = 0;
-        
-        // Threshold: 0.02 - 0.05 is typical for room acoustics; adjust based on distance to lecturer
-        const VOLUME_THRESHOLD = 0.025; 
-        const CHUNK_MAX_DURATION = 90000; // Send batch every 90s of speech
-        let accumulatedSpeechDuration = 0;
-        let loopInterval;
+    const n8nUploadWebhook = "https://jarvis.tailc9769c.ts.net:8443/webhook-test/upload-audio"; // Replace with your Tailscale IP
+    
+    let audioContext, analyser, microphone, mediaRecorder;
+    let audioChunks = [];
+    let isSpeaking = false;
+    let speechTimer = null;
+    let lastSpeechTime = 0;
+    
+    // Store the selected format globally so sendBatch can use it
+    let selectedType = ""; 
+    let fileExtension = "webm";
 
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const statusDiv = document.getElementById('status');
-        const meter = document.getElementById('meter');
+    const VOLUME_THRESHOLD = 0.025; 
+    const CHUNK_MAX_DURATION = 90000; 
+    let accumulatedSpeechDuration = 0;
+    let loopInterval;
 
-        startBtn.onclick = async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioContext.createAnalyser();
-                microphone = audioContext.createMediaStreamSource(stream);
-                microphone.connect(analyser);
-                analyser.fftSize = 512;
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusDiv = document.getElementById('status');
+    const meter = document.getElementById('meter');
 
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-                mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0 && isSpeaking) {
-                        audioChunks.push(e.data);
-                    }
-                };
+    startBtn.onclick = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            // 1. Define preferred formats that Gemini supports
+            const preferredTypes = [
+                "audio/mp4",
+                "audio/aac",
+                "audio/ogg;codecs=opus",
+                "audio/webm" // Fallback
+            ];
 
-                mediaRecorder.start(1000); // Check buffer every 1s
-                startBtn.style.display = 'none';
-                stopBtn.style.display = 'block';
-
-                const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-                loopInterval = setInterval(() => {
-                    analyser.getByteTimeDomainData(dataArray);
-                    
-                    // Compute RMS volume
-                    let sum = 0;
-                    for (let i = 0; i < dataArray.length; i++) {
-                        let val = (dataArray[i] - 128) / 128;
-                        sum += val * val;
-                    }
-                    let rms = Math.sqrt(sum / dataArray.length);
-                    meter.style.width = Math.min(100, rms * 400) + "%";
-
-                    // Voice Activity Detection
-                    if (rms > VOLUME_THRESHOLD) {
-                        isSpeaking = true;
-                        lastSpeechTime = Date.now();
-                        statusDiv.innerText = "Lecturer speaking... recording.";
-                        accumulatedSpeechDuration += 100;
-                    } else if (Date.now() - lastSpeechTime > 2000) {
-                        isSpeaking = false;
-                        statusDiv.innerText = "Silence/Pause... waiting for speech.";
-                    }
-
-                    // Once accumulated speech hits target, push chunk
-                    if (accumulatedSpeechDuration >= CHUNK_MAX_DURATION && audioChunks.length > 0) {
-                        sendBatch();
-                    }
-                }, 100);
-
-            } catch (err) {
-                statusDiv.innerText = "Error: " + err.message;
+            // 2. Find the first format the user's browser actually supports
+            for (const type of preferredTypes) {
+                if (MediaRecorder.isTypeSupported(type)) {
+                    selectedType = type;
+                    break;
+                }
             }
-        };
 
-        async function sendBatch() {
-            if (audioChunks.length === 0) return;
-            const blob = new Blob(audioChunks, { type: 'audio/webm' });
-            audioChunks = [];
-            accumulatedSpeechDuration = 0;
+            // Set the correct file extension based on the selected type
+            if (selectedType.includes("mp4")) fileExtension = "mp4";
+            else if (selectedType.includes("ogg")) fileExtension = "ogg";
+            else if (selectedType.includes("aac")) fileExtension = "aac";
 
-            const formData = new FormData();
-            formData.append('data', blob, 'speech_chunk.webm');
-            statusDiv.innerText = "Uploading speech chunk to server...";
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            analyser.fftSize = 512;
 
-            try {
-                await fetch(n8nUploadWebhook, { method: 'POST', body: formData });
-                statusDiv.innerText = "Chunk sent! Resuming detection...";
-            } catch (e) {
-                statusDiv.innerText = "Upload failed. Retrying next cycle.";
-            }
+            // 3. Initialize MediaRecorder with the dynamic format
+            const options = selectedType ? { mimeType: selectedType } : {};
+            mediaRecorder = new MediaRecorder(stream, options);
+            
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0 && isSpeaking) {
+                    audioChunks.push(e.data);
+                }
+            };
+
+            mediaRecorder.start(1000); // Check buffer every 1s
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'block';
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+            loopInterval = setInterval(() => {
+                analyser.getByteTimeDomainData(dataArray);
+                
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    let val = (dataArray[i] - 128) / 128;
+                    sum += val * val;
+                }
+                let rms = Math.sqrt(sum / dataArray.length);
+                meter.style.width = Math.min(100, rms * 400) + "%";
+
+                if (rms > VOLUME_THRESHOLD) {
+                    isSpeaking = true;
+                    lastSpeechTime = Date.now();
+                    statusDiv.innerText = "Lecturer speaking... recording.";
+                    accumulatedSpeechDuration += 100;
+                } else if (Date.now() - lastSpeechTime > 2000) {
+                    isSpeaking = false;
+                    statusDiv.innerText = "Silence/Pause... waiting for speech.";
+                }
+
+                if (accumulatedSpeechDuration >= CHUNK_MAX_DURATION && audioChunks.length > 0) {
+                    sendBatch();
+                }
+            }, 100);
+
+        } catch (err) {
+            statusDiv.innerText = "Error: " + err.message;
         }
+    };
 
-        stopBtn.onclick = () => {
-            clearInterval(loopInterval);
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-            if (audioContext) audioContext.close();
-            sendBatch();
-            startBtn.style.display = 'block';
-            stopBtn.style.display = 'none';
-            statusDiv.innerText = "Recording finished.";
-        };
-    </script>
+    async function sendBatch() {
+        if (audioChunks.length === 0) return;
+        
+        // Use the dynamically selected type here
+        const blob = new Blob(audioChunks, { type: selectedType || 'audio/webm' });
+        audioChunks = [];
+        accumulatedSpeechDuration = 0;
+
+        const formData = new FormData();
+        // Use the dynamically generated file extension
+        formData.append('data', blob, `speech_chunk.${fileExtension}`);
+        statusDiv.innerText = `Uploading ${fileExtension.toUpperCase()} chunk to server...`;
+
+        try {
+            await fetch(n8nUploadWebhook, { method: 'POST', body: formData });
+            statusDiv.innerText = "Chunk sent! Resuming detection...";
+        } catch (e) {
+            statusDiv.innerText = "Upload failed. Retrying next cycle.";
+        }
+    }
+
+    stopBtn.onclick = () => {
+        clearInterval(loopInterval);
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+        if (audioContext) audioContext.close();
+        sendBatch();
+        startBtn.style.display = 'block';
+        stopBtn.style.display = 'none';
+        statusDiv.innerText = "Recording finished.";
+    };
+</script>
 </body>
 </html>
