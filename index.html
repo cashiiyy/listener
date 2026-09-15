@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Class Recorder (VAD)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+        .card { background: #1e293b; padding: 24px; border-radius: 12px; width: 100%; max-width: 380px; text-align: center; }
+        button { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; margin-top: 16px; }
+        #startBtn { background: #22c55e; color: white; }
+        #stopBtn { background: #ef4444; color: white; display: none; }
+        .meter-container { background: #334155; height: 12px; border-radius: 6px; margin: 20px 0; overflow: hidden; }
+        #meter { width: 0%; height: 100%; background: #38bdf8; transition: width 0.05s; }
+        #status { font-size: 14px; color: #94a3b8; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Smart Class Recorder</h2>
+        <div class="meter-container"><div id="meter"></div></div>
+        <div id="status">Tap Start. Recording triggers only when speech is detected.</div>
+        <button id="startBtn">Start Listening</button>
+        <button id="stopBtn">Stop</button>
+    </div>
+
+    <script>
+        const n8nUploadWebhook = "http://100.x.x.x:5678/webhook/upload-audio"; // Replace with your Tailscale IP
+        
+        let audioContext, analyser, microphone, mediaRecorder;
+        let audioChunks = [];
+        let isSpeaking = false;
+        let speechTimer = null;
+        let lastSpeechTime = 0;
+        
+        // Threshold: 0.02 - 0.05 is typical for room acoustics; adjust based on distance to lecturer
+        const VOLUME_THRESHOLD = 0.025; 
+        const CHUNK_MAX_DURATION = 90000; // Send batch every 90s of speech
+        let accumulatedSpeechDuration = 0;
+        let loopInterval;
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const statusDiv = document.getElementById('status');
+        const meter = document.getElementById('meter');
+
+        startBtn.onclick = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                analyser.fftSize = 512;
+
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0 && isSpeaking) {
+                        audioChunks.push(e.data);
+                    }
+                };
+
+                mediaRecorder.start(1000); // Check buffer every 1s
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'block';
+
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                loopInterval = setInterval(() => {
+                    analyser.getByteTimeDomainData(dataArray);
+                    
+                    // Compute RMS volume
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) {
+                        let val = (dataArray[i] - 128) / 128;
+                        sum += val * val;
+                    }
+                    let rms = Math.sqrt(sum / dataArray.length);
+                    meter.style.width = Math.min(100, rms * 400) + "%";
+
+                    // Voice Activity Detection
+                    if (rms > VOLUME_THRESHOLD) {
+                        isSpeaking = true;
+                        lastSpeechTime = Date.now();
+                        statusDiv.innerText = "Lecturer speaking... recording.";
+                        accumulatedSpeechDuration += 100;
+                    } else if (Date.now() - lastSpeechTime > 2000) {
+                        isSpeaking = false;
+                        statusDiv.innerText = "Silence/Pause... waiting for speech.";
+                    }
+
+                    // Once accumulated speech hits target, push chunk
+                    if (accumulatedSpeechDuration >= CHUNK_MAX_DURATION && audioChunks.length > 0) {
+                        sendBatch();
+                    }
+                }, 100);
+
+            } catch (err) {
+                statusDiv.innerText = "Error: " + err.message;
+            }
+        };
+
+        async function sendBatch() {
+            if (audioChunks.length === 0) return;
+            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            audioChunks = [];
+            accumulatedSpeechDuration = 0;
+
+            const formData = new FormData();
+            formData.append('data', blob, 'speech_chunk.webm');
+            statusDiv.innerText = "Uploading speech chunk to server...";
+
+            try {
+                await fetch(n8nUploadWebhook, { method: 'POST', body: formData });
+                statusDiv.innerText = "Chunk sent! Resuming detection...";
+            } catch (e) {
+                statusDiv.innerText = "Upload failed. Retrying next cycle.";
+            }
+        }
+
+        stopBtn.onclick = () => {
+            clearInterval(loopInterval);
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+            if (audioContext) audioContext.close();
+            sendBatch();
+            startBtn.style.display = 'block';
+            stopBtn.style.display = 'none';
+            statusDiv.innerText = "Recording finished.";
+        };
+    </script>
+</body>
+</html>
