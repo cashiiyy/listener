@@ -1,159 +1,1849 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Smart Class Recorder (VAD)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { font-family: -apple-system, sans-serif; background: #0f172a; color: white; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
-        .card { background: #1e293b; padding: 24px; border-radius: 12px; width: 100%; max-width: 380px; text-align: center; }
-        button { width: 100%; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; margin-top: 16px; }
-        #startBtn { background: #22c55e; color: white; }
-        #stopBtn { background: #ef4444; color: white; display: none; }
-        .meter-container { background: #334155; height: 12px; border-radius: 6px; margin: 20px 0; overflow: hidden; }
-        #meter { width: 0%; height: 100%; background: #38bdf8; transition: width 0.05s; }
-        #status { font-size: 14px; color: #94a3b8; margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>Smart Class Recorder</h2>
-        <div class="meter-container"><div id="meter"></div></div>
-        <div id="status">Tap Start. Recording triggers only when speech is detected.</div>
-        <button id="startBtn">Start Listening</button>
-        <button id="stopBtn">Stop</button>
-    </div>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1220">
+<title>Smart Class Recorder</title>
 
-    <script>
-    const n8nUploadWebhook = "https://jarvis.tailc9769c.ts.net:8443/webhook-test/upload-audio"; // Replace with your Tailscale IP
-    
-    let audioContext, analyser, microphone, mediaRecorder;
-    let audioChunks = [];
-    let isSpeaking = false;
-    let speechTimer = null;
-    let lastSpeechTime = 0;
-    
-    // Store the selected format globally so sendBatch can use it
-    let selectedType = ""; 
-    let fileExtension = "webm";
+<style>
+    :root {
+        --bg: #0b1220;
+        --panel: rgba(17, 27, 46, 0.92);
+        --panel-2: #121e33;
+        --border: rgba(148, 163, 184, 0.18);
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --green: #22c55e;
+        --green-dark: #16a34a;
+        --red: #ef4444;
+        --blue: #38bdf8;
+        --amber: #f59e0b;
+        --shadow: 0 24px 70px rgba(0,0,0,.35);
+    }
 
-    const VOLUME_THRESHOLD = 0.025; 
-    const CHUNK_MAX_DURATION = 90000; 
-    let accumulatedSpeechDuration = 0;
-    let loopInterval;
+    * { box-sizing: border-box; }
 
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const statusDiv = document.getElementById('status');
-    const meter = document.getElementById('meter');
+    html, body {
+        margin: 0;
+        min-height: 100%;
+    }
 
-    startBtn.onclick = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            
-            // 1. Define preferred formats that Gemini supports
-            const preferredTypes = [
-                "audio/mp4",
-                "audio/aac",
-                "audio/ogg;codecs=opus",
-                "audio/webm" // Fallback
-            ];
+    body {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+                     "Segoe UI", sans-serif;
+        background:
+            radial-gradient(circle at 20% 0%, rgba(56,189,248,.10), transparent 32rem),
+            radial-gradient(circle at 90% 15%, rgba(34,197,94,.08), transparent 30rem),
+            var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+    }
 
-            // 2. Find the first format the user's browser actually supports
-            for (const type of preferredTypes) {
-                if (MediaRecorder.isTypeSupported(type)) {
-                    selectedType = type;
-                    break;
-                }
-            }
+    .app {
+        width: min(760px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 32px 0 44px;
+    }
 
-            // Set the correct file extension based on the selected type
-            if (selectedType.includes("mp4")) fileExtension = "mp4";
-            else if (selectedType.includes("ogg")) fileExtension = "ogg";
-            else if (selectedType.includes("aac")) fileExtension = "aac";
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
 
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            analyser = audioContext.createAnalyser();
-            microphone = audioContext.createMediaStreamSource(stream);
-            microphone.connect(analyser);
-            analyser.fftSize = 512;
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-            // 3. Initialize MediaRecorder with the dynamic format
-            const options = selectedType ? { mimeType: selectedType } : {};
-            mediaRecorder = new MediaRecorder(stream, options);
-            
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0 && isSpeaking) {
-                    audioChunks.push(e.data);
-                }
-            };
+    .brand-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #22c55e, #0ea5e9);
+        box-shadow: 0 10px 28px rgba(14,165,233,.18);
+        font-size: 22px;
+    }
 
-            mediaRecorder.start(1000); // Check buffer every 1s
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'block';
+    h1 {
+        margin: 0;
+        font-size: clamp(24px, 5vw, 32px);
+        letter-spacing: -.03em;
+    }
 
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    .subtitle {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+    }
 
-            loopInterval = setInterval(() => {
-                analyser.getByteTimeDomainData(dataArray);
-                
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) {
-                    let val = (dataArray[i] - 128) / 128;
-                    sum += val * val;
-                }
-                let rms = Math.sqrt(sum / dataArray.length);
-                meter.style.width = Math.min(100, rms * 400) + "%";
+    .connection {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 11px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(15,23,42,.65);
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+    }
 
-                if (rms > VOLUME_THRESHOLD) {
-                    isSpeaking = true;
-                    lastSpeechTime = Date.now();
-                    statusDiv.innerText = "Lecturer speaking... recording.";
-                    accumulatedSpeechDuration += 100;
-                } else if (Date.now() - lastSpeechTime > 2000) {
-                    isSpeaking = false;
-                    statusDiv.innerText = "Silence/Pause... waiting for speech.";
-                }
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #64748b;
+    }
 
-                if (accumulatedSpeechDuration >= CHUNK_MAX_DURATION && audioChunks.length > 0) {
-                    sendBatch();
-                }
-            }, 100);
+    .dot.ready { background: var(--green); box-shadow: 0 0 12px rgba(34,197,94,.65); }
+    .dot.busy { background: var(--amber); box-shadow: 0 0 12px rgba(245,158,11,.55); }
+    .dot.error { background: var(--red); }
 
-        } catch (err) {
-            statusDiv.innerText = "Error: " + err.message;
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+        overflow: hidden;
+    }
+
+    .card-main { padding: 24px; }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    label {
+        display: block;
+        color: #cbd5e1;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 7px;
+    }
+
+    input, select {
+        width: 100%;
+        border: 1px solid #334155;
+        background: #0b1425;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 12px 13px;
+        outline: none;
+        font: inherit;
+        font-size: 14px;
+        transition: .2s ease;
+    }
+
+    input:focus, select:focus {
+        border-color: rgba(56,189,248,.7);
+        box-shadow: 0 0 0 3px rgba(56,189,248,.10);
+    }
+
+    input:disabled, select:disabled {
+        opacity: .55;
+    }
+
+    .status-box {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 14px;
+        padding: 14px;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin-bottom: 18px;
+    }
+
+    .record-indicator {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: #1e293b;
+        color: #64748b;
+    }
+
+    .record-indicator.active {
+        color: white;
+        background: rgba(239,68,68,.16);
+        box-shadow: inset 0 0 0 1px rgba(239,68,68,.25);
+    }
+
+    .record-indicator span {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .record-indicator.active span {
+        animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+        50% { transform: scale(.65); opacity: .55; }
+    }
+
+    .status-title {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .status-detail {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .timer {
+        font-variant-numeric: tabular-nums;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .meter-wrap {
+        margin: 18px 0;
+    }
+
+    .meter-head {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 11px;
+        margin-bottom: 7px;
+    }
+
+    .meter-container {
+        height: 12px;
+        border-radius: 999px;
+        background: #26364e;
+        overflow: hidden;
+    }
+
+    #meter {
+        width: 0%;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #38bdf8, #22c55e);
+        transition: width .08s linear;
+    }
+
+    .progress {
+        height: 5px;
+        background: #1e293b;
+        border-radius: 99px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    #chunkProgress {
+        width: 0%;
+        height: 100%;
+        background: var(--blue);
+        transition: width .2s linear;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 18px 0;
+    }
+
+    .stat {
+        padding: 13px;
+        background: var(--panel-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        min-width: 0;
+    }
+
+    .stat-value {
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .stat-label {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    button {
+        border: 0;
+        border-radius: 13px;
+        padding: 14px 16px;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform .15s ease, filter .15s ease, opacity .15s ease;
+    }
+
+    button:hover { filter: brightness(1.06); }
+    button:active { transform: translateY(1px); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    #startBtn {
+        background: linear-gradient(135deg, var(--green), var(--green-dark));
+        color: white;
+    }
+
+    #stopBtn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        display: none;
+    }
+
+    .secondary {
+        background: #24324a;
+        color: #e2e8f0;
+    }
+
+    .queue {
+        margin-top: 18px;
+        padding: 15px;
+        background: #0c1628;
+        border-top: 1px solid var(--border);
+    }
+
+    .queue-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .queue-title {
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .queue-state {
+        color: var(--muted);
+        font-size: 11px;
+    }
+
+    .queue-list {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        max-height: 150px;
+        overflow: auto;
+    }
+
+    .queue-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 9px 10px;
+        border-radius: 9px;
+        background: #111d31;
+        color: #cbd5e1;
+        font-size: 11px;
+    }
+
+    .queue-item .state {
+        color: var(--muted);
+    }
+
+    .footer-note {
+        text-align: center;
+        color: #64748b;
+        font-size: 11px;
+        margin-top: 15px;
+        line-height: 1.5;
+    }
+
+    .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 22px;
+        transform: translate(-50%, 20px);
+        background: #111827;
+        border: 1px solid #334155;
+        color: #f8fafc;
+        padding: 11px 14px;
+        border-radius: 11px;
+        box-shadow: var(--shadow);
+        opacity: 0;
+        pointer-events: none;
+        transition: .22s ease;
+        font-size: 12px;
+        max-width: min(90vw, 520px);
+        text-align: center;
+        z-index: 20;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 600px) {
+        .app {
+            width: min(100% - 20px, 760px);
+            padding-top: 18px;
         }
-    };
 
-    async function sendBatch() {
-        if (audioChunks.length === 0) return;
-        
-        // Use the dynamically selected type here
-        const blob = new Blob(audioChunks, { type: selectedType || 'audio/webm' });
-        audioChunks = [];
-        accumulatedSpeechDuration = 0;
+        .header {
+            align-items: flex-start;
+        }
 
-        const formData = new FormData();
-        // Use the dynamically generated file extension
-        formData.append('data', blob, `speech_chunk.${fileExtension}`);
-        statusDiv.innerText = `Uploading ${fileExtension.toUpperCase()} chunk to server...`;
+        .connection {
+            font-size: 10px;
+            padding: 7px 9px;
+        }
 
-        try {
-            await fetch(n8nUploadWebhook, { method: 'POST', body: formData });
-            statusDiv.innerText = "Chunk sent! Resuming detection...";
-        } catch (e) {
-            statusDiv.innerText = "Upload failed. Retrying next cycle.";
+        .card-main { padding: 18px; }
+
+        .field-row {
+            grid-template-columns: 1fr;
+        }
+
+        .status-box {
+            grid-template-columns: auto 1fr;
+        }
+
+        .timer {
+            grid-column: 2;
+        }
+
+        .actions {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+
+<body>
+<div class="app">
+
+    <header class="header">
+        <div class="brand">
+            <div class="brand-icon">🎙️</div>
+            <div>
+                <h1>Smart Class Recorder</h1>
+                <div class="subtitle">Lecture Listener · VAD + n8n ingestion</div>
+            </div>
+        </div>
+
+        <div class="connection">
+            <span id="connectionDot" class="dot"></span>
+            <span id="connectionText">Ready</span>
+        </div>
+    </header>
+
+    <main class="card">
+
+        <section class="card-main">
+
+            <div class="field-row">
+                <div>
+                    <label for="classId">CLASS ID</label>
+                    <input id="classId" type="text" value="s3-lecture-001"
+                           placeholder="e.g. s3-maths-001" autocomplete="off">
+                </div>
+
+                <div>
+                    <label for="language">LECTURE LANGUAGE</label>
+                    <select id="language">
+                        <option value="auto">Auto detect</option>
+                        <option value="en">English</option>
+                        <option value="ml">Malayalam</option>
+                        <option value="hi">Hindi</option>
+                        <option value="ta">Tamil</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="status-box">
+                <div id="recordIndicator" class="record-indicator">
+                    <span></span>
+                </div>
+
+                <div>
+                    <div id="statusTitle" class="status-title">Ready to listen</div>
+                    <div id="statusDetail" class="status-detail">
+                        Start the recorder when the lecture begins.
+                    </div>
+                </div>
+
+                <div id="timer" class="timer">00:00:00</div>
+            </div>
+
+            <div class="meter-wrap">
+                <div class="meter-head">
+                    <span>MICROPHONE LEVEL</span>
+                    <span id="vadState">Waiting</span>
+                </div>
+
+                <div class="meter-container">
+                    <div id="meter"></div>
+                </div>
+            </div>
+
+            <div class="meter-wrap">
+                <div class="meter-head">
+                    <span>CURRENT CHUNK</span>
+                    <span id="chunkLabel">Chunk 1</span>
+                </div>
+
+                <div class="progress">
+                    <div id="chunkProgress"></div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div id="chunkCount" class="stat-value">0</div>
+                    <div class="stat-label">Uploaded chunks</div>
+                </div>
+
+                <div class="stat">
+                    <div id="pendingCount" class="stat-value">0</div>
+                    <div class="stat-label">Pending uploads</div>
+                </div>
+
+                <div class="stat">
+                    <div id="failedCount" class="stat-value">0</div>
+                    <div class="stat-label">Retry queue</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="startBtn">▶ Start Listening</button>
+                <button id="stopBtn">■ Stop & Finalize</button>
+            </div>
+
+        </section>
+
+        <section class="queue">
+            <div class="queue-header">
+                <div class="queue-title">Upload Queue</div>
+                <div id="queueState" class="queue-state">No pending uploads</div>
+            </div>
+
+            <div id="queueList" class="queue-list"></div>
+        </section>
+
+    </main>
+
+    <div class="footer-note">
+        Audio is uploaded as independent chunks. Failed uploads remain queued and are retried
+        automatically instead of being silently discarded.
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/*
+ * ============================================================
+ * SMART CLASS RECORDER
+ * ============================================================
+ *
+ * Backend contract:
+ *
+ * POST /webhook/upload-audio
+ * multipart/form-data:
+ *   data               = audio Blob
+ *   class_id           = string
+ *   sequence           = integer
+ *   language           = auto/en/ml/...
+ *   target_language    = optional
+ *   duration_seconds   = number
+ *
+ * POST /webhook/lecture/end
+ * JSON:
+ *   { class_id, target_language }
+ *
+ * IMPORTANT:
+ *   Use /webhook-test/... only while the n8n workflow is
+ *   manually listening in test mode.
+ */
+
+const CONFIG = {
+    uploadWebhook:
+        "https://jarvis.tailc9769c.ts.net:8443/webhook/upload-audio",
+
+    endWebhook:
+        "https://jarvis.tailc9769c.ts.net:8443/webhook/lecture/end",
+
+    /*
+     * Five-minute recorder rotation keeps each WebM file
+     * independently decodable and avoids a giant browser blob.
+     * For testing, reduce to 60-90 seconds.
+     */
+    chunkDurationMs: 5 * 60 * 1000,
+
+    /*
+     * VAD controls only the UI and speech accounting.
+     * The complete recorder chunk is uploaded so WebM
+     * container headers/keyframes are not damaged.
+     */
+    vadThreshold: 0.025,
+    silenceTimeoutMs: 2000,
+
+    /*
+     * Retry policy.
+     */
+    retryBaseMs: 3000,
+    maxRetries: 8,
+
+    /*
+     * IndexedDB database for pending upload persistence.
+     */
+    dbName: "smart-class-recorder",
+    dbVersion: 1,
+    storeName: "uploadQueue"
+};
+
+let audioContext = null;
+let analyser = null;
+let microphone = null;
+let stream = null;
+let mediaRecorder = null;
+let vadInterval = null;
+let timerInterval = null;
+
+let recordingStartedAt = 0;
+let currentChunkStartedAt = 0;
+
+let sequence = 1;
+let uploadedChunks = 0;
+
+let isRecording = false;
+let isStopping = false;
+let uploadRunning = false;
+
+let selectedType = "";
+let fileExtension = "webm";
+
+let lastSpeechTime = 0;
+let isSpeaking = false;
+
+let chunkBuffer = [];
+let queue = [];
+
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+const classIdInput = document.getElementById("classId");
+const languageSelect = document.getElementById("language");
+
+const meter = document.getElementById("meter");
+const vadState = document.getElementById("vadState");
+const statusTitle = document.getElementById("statusTitle");
+const statusDetail = document.getElementById("statusDetail");
+const timer = document.getElementById("timer");
+const chunkProgress = document.getElementById("chunkProgress");
+const chunkLabel = document.getElementById("chunkLabel");
+
+const chunkCount = document.getElementById("chunkCount");
+const pendingCount = document.getElementById("pendingCount");
+const failedCount = document.getElementById("failedCount");
+
+const connectionDot = document.getElementById("connectionDot");
+const connectionText = document.getElementById("connectionText");
+
+const queueState = document.getElementById("queueState");
+const queueList = document.getElementById("queueList");
+
+const recordIndicator = document.getElementById("recordIndicator");
+const toast = document.getElementById("toast");
+
+
+/* ============================================================
+ * UI
+ * ============================================================ */
+
+function setConnection(state, text) {
+    connectionDot.className = "dot " + state;
+    connectionText.textContent = text;
+}
+
+function setStatus(title, detail) {
+    statusTitle.textContent = title;
+    statusDetail.textContent = detail;
+}
+
+function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(
+        () => toast.classList.remove("show"),
+        3500
+    );
+}
+
+function formatTime(ms) {
+    const total = Math.max(0, Math.floor(ms / 1000));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+
+    return [
+        String(h).padStart(2, "0"),
+        String(m).padStart(2, "0"),
+        String(s).padStart(2, "0")
+    ].join(":");
+}
+
+function updateQueueUI() {
+    const pending = queue.filter(x => x.status !== "uploaded");
+    const retrying = queue.filter(x => x.status === "retry");
+
+    pendingCount.textContent = pending.length;
+    failedCount.textContent = retrying.length;
+    chunkCount.textContent = uploadedChunks;
+
+    queueState.textContent =
+        pending.length === 0
+            ? "No pending uploads"
+            : `${pending.length} pending`;
+
+    queueList.innerHTML = "";
+
+    pending.slice(-8).forEach(item => {
+        const row = document.createElement("div");
+        row.className = "queue-item";
+
+        const left = document.createElement("span");
+        left.textContent = `Chunk ${item.sequence}`;
+
+        const right = document.createElement("span");
+        right.className = "state";
+        right.textContent =
+            item.status === "retry"
+                ? `Retry ${item.retries}/${CONFIG.maxRetries}`
+                : item.status === "uploading"
+                    ? "Uploading..."
+                    : "Queued";
+
+        row.appendChild(left);
+        row.appendChild(right);
+        queueList.appendChild(row);
+    });
+}
+
+
+/* ============================================================
+ * INDEXEDDB
+ * ============================================================ */
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+
+        const request =
+            indexedDB.open(CONFIG.dbName, CONFIG.dbVersion);
+
+        request.onupgradeneeded = () => {
+            const db = request.result;
+
+            if (!db.objectStoreNames.contains(CONFIG.storeName)) {
+                const store =
+                    db.createObjectStore(
+                        CONFIG.storeName,
+                        { keyPath: "id" }
+                    );
+
+                store.createIndex(
+                    "class_id",
+                    "class_id",
+                    { unique: false }
+                );
+            }
+        };
+
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function dbPut(item) {
+    const db = await openDB();
+
+    return new Promise((resolve, reject) => {
+
+        const tx =
+            db.transaction(CONFIG.storeName, "readwrite");
+
+        tx.objectStore(CONFIG.storeName).put(item);
+
+        tx.oncomplete = () => {
+            db.close();
+            resolve();
+        };
+
+        tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+        };
+    });
+}
+
+async function dbDelete(id) {
+    const db = await openDB();
+
+    return new Promise((resolve, reject) => {
+
+        const tx =
+            db.transaction(CONFIG.storeName, "readwrite");
+
+        tx.objectStore(CONFIG.storeName).delete(id);
+
+        tx.oncomplete = () => {
+            db.close();
+            resolve();
+        };
+
+        tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+        };
+    });
+}
+
+async function dbGetAll() {
+    const db = await openDB();
+
+    return new Promise((resolve, reject) => {
+
+        const tx =
+            db.transaction(CONFIG.storeName, "readonly");
+
+        const request =
+            tx.objectStore(CONFIG.storeName).getAll();
+
+        request.onsuccess = () => {
+            db.close();
+            resolve(request.result || []);
+        };
+
+        request.onerror = () => {
+            db.close();
+            reject(request.error);
+        };
+    });
+}
+
+
+/* ============================================================
+ * FORMAT
+ * ============================================================ */
+
+function selectRecordingFormat() {
+
+    const types = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/ogg;codecs=opus",
+        "audio/ogg"
+    ];
+
+    selectedType = "";
+
+    for (const type of types) {
+        if (MediaRecorder.isTypeSupported(type)) {
+            selectedType = type;
+            break;
         }
     }
 
-    stopBtn.onclick = () => {
-        clearInterval(loopInterval);
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-        if (audioContext) audioContext.close();
-        sendBatch();
-        startBtn.style.display = 'block';
-        stopBtn.style.display = 'none';
-        statusDiv.innerText = "Recording finished.";
+    if (!selectedType) {
+        fileExtension = "webm";
+        return;
+    }
+
+    fileExtension =
+        selectedType.includes("ogg")
+            ? "ogg"
+            : "webm";
+}
+
+
+/* ============================================================
+ * RECORDING
+ * ============================================================ */
+
+async function startRecording() {
+
+    const classId =
+        classIdInput.value.trim();
+
+    if (!classId) {
+        showToast("Enter a Class ID first.");
+        classIdInput.focus();
+        return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+        showToast("Microphone access is not supported in this browser.");
+        return;
+    }
+
+    if (!window.MediaRecorder) {
+        showToast("MediaRecorder is not supported in this browser.");
+        return;
+    }
+
+    try {
+
+        selectRecordingFormat();
+
+        stream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
+                    channelCount: 1
+                }
+            });
+
+        audioContext =
+            new (window.AudioContext ||
+                 window.webkitAudioContext)();
+
+        await audioContext.resume();
+
+        analyser =
+            audioContext.createAnalyser();
+
+        analyser.fftSize = 512;
+
+        microphone =
+            audioContext.createMediaStreamSource(stream);
+
+        microphone.connect(analyser);
+
+        const options =
+            selectedType
+                ? { mimeType: selectedType }
+                : {};
+
+        mediaRecorder =
+            new MediaRecorder(stream, options);
+
+        chunkBuffer = [];
+
+        mediaRecorder.ondataavailable = event => {
+
+            if (event.data && event.data.size > 0) {
+                chunkBuffer.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = async () => {
+            await finalizeCurrentRecorderChunk();
+        };
+
+        mediaRecorder.onerror = event => {
+            console.error("MediaRecorder error:", event.error);
+            setStatus(
+                "Recorder error",
+                event.error?.message || "MediaRecorder failed."
+            );
+        };
+
+        /*
+         * Request data every second.
+         */
+        mediaRecorder.start(1000);
+
+        isRecording = true;
+        isStopping = false;
+
+        recordingStartedAt = Date.now();
+        currentChunkStartedAt = Date.now();
+        lastSpeechTime = Date.now();
+
+        startBtn.style.display = "none";
+        stopBtn.style.display = "block";
+
+        recordIndicator.classList.add("active");
+
+        setConnection("ready", "Recording");
+        setStatus(
+            "Listening...",
+            "Speech detection is active. Audio is being buffered safely."
+        );
+
+        startTimers();
+        startVAD();
+
+        showToast("Recording started.");
+
+    } catch (error) {
+
+        console.error(error);
+
+        cleanupMedia();
+
+        setConnection("error", "Microphone error");
+
+        setStatus(
+            "Could not start",
+            error.message || "Microphone permission was denied."
+        );
+
+        showToast(error.message || "Could not access microphone.");
+    }
+}
+
+
+function startVAD() {
+
+    const dataArray =
+        new Uint8Array(analyser.frequencyBinCount);
+
+    vadInterval =
+        setInterval(() => {
+
+            if (!analyser || !isRecording) {
+                return;
+            }
+
+            analyser.getByteTimeDomainData(dataArray);
+
+            let sum = 0;
+
+            for (let i = 0; i < dataArray.length; i++) {
+
+                const value =
+                    (dataArray[i] - 128) / 128;
+
+                sum += value * value;
+            }
+
+            const rms =
+                Math.sqrt(sum / dataArray.length);
+
+            const level =
+                Math.min(100, rms * 400);
+
+            meter.style.width = level + "%";
+
+            if (rms > CONFIG.vadThreshold) {
+
+                isSpeaking = true;
+                lastSpeechTime = Date.now();
+
+                vadState.textContent = "Speaking";
+                setStatus(
+                    "Lecturer speaking",
+                    "Voice activity detected."
+                );
+
+            } else if (
+                Date.now() - lastSpeechTime >
+                CONFIG.silenceTimeoutMs
+            ) {
+
+                isSpeaking = false;
+
+                vadState.textContent = "Silence";
+                setStatus(
+                    "Listening...",
+                    "Silence detected. Waiting for speech."
+                );
+            }
+
+            /*
+             * Rotate the recorder by WALL CLOCK time.
+             *
+             * This guarantees independent audio files even
+             * when the lecturer pauses for several minutes.
+             */
+            const elapsed =
+                Date.now() - currentChunkStartedAt;
+
+            const percent =
+                Math.min(
+                    100,
+                    (elapsed / CONFIG.chunkDurationMs) * 100
+                );
+
+            chunkProgress.style.width =
+                percent + "%";
+
+            if (
+                elapsed >= CONFIG.chunkDurationMs &&
+                !uploadRunning
+            ) {
+                rotateRecorder();
+            }
+
+        }, 100);
+}
+
+
+function startTimers() {
+
+    timerInterval =
+        setInterval(() => {
+
+            if (!isRecording) {
+                return;
+            }
+
+            timer.textContent =
+                formatTime(
+                    Date.now() - recordingStartedAt
+                );
+
+        }, 250);
+}
+
+
+/*
+ * Stop the current MediaRecorder and immediately create
+ * a new independent recorder when continuing.
+ */
+async function rotateRecorder() {
+
+    if (!mediaRecorder ||
+        mediaRecorder.state === "inactive") {
+        return;
+    }
+
+    const oldRecorder = mediaRecorder;
+
+    currentChunkStartedAt = Date.now();
+
+    /*
+     * Reset UI immediately.
+     */
+    chunkProgress.style.width = "0%";
+
+    /*
+     * onstop() will finalize the old chunk.
+     * We don't call send directly from here.
+     */
+    oldRecorder.stop();
+
+    /*
+     * Wait briefly for onstop/ondataavailable.
+     */
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    if (!isRecording || isStopping) {
+        return;
+    }
+
+    createNextRecorder();
+}
+
+
+function createNextRecorder() {
+
+    if (!stream || !isRecording) {
+        return;
+    }
+
+    chunkBuffer = [];
+
+    const options =
+        selectedType
+            ? { mimeType: selectedType }
+            : {};
+
+    mediaRecorder =
+        new MediaRecorder(stream, options);
+
+    mediaRecorder.ondataavailable = event => {
+
+        if (event.data && event.data.size > 0) {
+            chunkBuffer.push(event.data);
+        }
     };
+
+    mediaRecorder.onstop = async () => {
+        await finalizeCurrentRecorderChunk();
+    };
+
+    mediaRecorder.start(1000);
+
+    sequence = getNextSequenceNumber();
+
+    chunkLabel.textContent =
+        `Chunk ${sequence}`;
+}
+
+
+/*
+ * Important:
+ * Because onstop can race with recorder rotation, the safest
+ * production design is to snapshot the buffer before starting
+ * the next recorder.
+ */
+async function finalizeCurrentRecorderChunk() {
+
+    /*
+     * The browser has already moved the current buffer into
+     * chunkBuffer before onstop.
+     */
+    const parts = chunkBuffer.slice();
+
+    chunkBuffer = [];
+
+    if (parts.length === 0) {
+        return;
+    }
+
+    const blob =
+        new Blob(
+            parts,
+            {
+                type:
+                    selectedType ||
+                    "audio/webm"
+            }
+        );
+
+    const classId =
+        classIdInput.value.trim();
+
+    const durationSeconds =
+        Math.max(
+            1,
+            Math.round(
+                Math.min(
+                    CONFIG.chunkDurationMs,
+                    Date.now() - currentChunkStartedAt
+                ) / 1000
+            )
+        );
+
+    const item = {
+        id:
+            `${classId}-${sequence}-${Date.now()}`,
+
+        class_id:
+            classId,
+
+        sequence:
+            sequence,
+
+        language:
+            languageSelect.value || "auto",
+
+        target_language:
+            "",
+
+        duration_seconds:
+            durationSeconds,
+
+        fileName:
+            `speech_chunk_${sequence}.${fileExtension}`,
+
+        mimeType:
+            selectedType || "audio/webm",
+
+        blob:
+            blob,
+
+        status:
+            "queued",
+
+        retries:
+            0,
+
+        createdAt:
+            Date.now()
+    };
+
+    /*
+     * Persist BEFORE uploading.
+     *
+     * If the network dies, the chunk remains available in
+     * IndexedDB and will be retried.
+     */
+    await dbPut(item);
+
+    queue.push(item);
+
+    updateQueueUI();
+
+    processUploadQueue();
+}
+
+
+/* ============================================================
+ * UPLOAD QUEUE
+ * ============================================================ */
+
+async function processUploadQueue() {
+
+    if (uploadRunning) {
+        return;
+    }
+
+    if (!navigator.onLine) {
+        setConnection("error", "Offline");
+        return;
+    }
+
+    const next =
+        queue.find(
+            item =>
+                item.status === "queued" ||
+                item.status === "retry"
+        );
+
+    if (!next) {
+        return;
+    }
+
+    uploadRunning = true;
+
+    next.status = "uploading";
+
+    updateQueueUI();
+
+    try {
+
+        await uploadChunk(next);
+
+        next.status = "uploaded";
+
+        await dbDelete(next.id);
+
+        queue =
+            queue.filter(
+                item => item.id !== next.id
+            );
+
+        uploadedChunks++;
+
+        setConnection("ready", "Connected");
+
+        setStatus(
+            "Chunk uploaded",
+            `Chunk ${next.sequence} is safely registered in n8n.`
+        );
+
+        updateQueueUI();
+
+    } catch (error) {
+
+        console.error(
+            `Chunk ${next.sequence} failed:`,
+            error
+        );
+
+        next.retries++;
+
+        if (next.retries >= CONFIG.maxRetries) {
+
+            next.status = "retry";
+
+            setConnection("error", "Upload retry needed");
+
+            setStatus(
+                "Upload waiting",
+                `Chunk ${next.sequence} remains safely stored locally.`
+            );
+
+        } else {
+
+            next.status = "retry";
+
+            setConnection("busy", "Retrying");
+
+            setStatus(
+                "Upload failed",
+                `Chunk ${next.sequence} will retry automatically.`
+            );
+        }
+
+        await dbPut(next);
+
+        updateQueueUI();
+
+        const delay =
+            CONFIG.retryBaseMs *
+            Math.min(
+                10,
+                Math.pow(2, Math.min(next.retries, 5))
+            );
+
+        await new Promise(
+            resolve => setTimeout(resolve, delay)
+        );
+    }
+
+    uploadRunning = false;
+
+    updateQueueUI();
+
+    if (queue.some(
+        item =>
+            item.status === "queued" ||
+            item.status === "retry"
+    )) {
+        processUploadQueue();
+    }
+}
+
+
+async function uploadChunk(item) {
+
+    const formData = new FormData();
+
+    formData.append(
+        "data",
+        item.blob,
+        item.fileName
+    );
+
+    formData.append(
+        "class_id",
+        item.class_id
+    );
+
+    formData.append(
+        "sequence",
+        String(item.sequence)
+    );
+
+    formData.append(
+        "language",
+        item.language
+    );
+
+    formData.append(
+        "target_language",
+        item.target_language
+    );
+
+    formData.append(
+        "duration_seconds",
+        String(item.duration_seconds)
+    );
+
+
+    const controller =
+        new AbortController();
+
+    const timeout =
+        setTimeout(
+            () => controller.abort(),
+            60_000
+        );
+
+
+    let response;
+
+    try {
+
+        response =
+            await fetch(
+                CONFIG.uploadWebhook,
+                {
+                    method: "POST",
+                    body: formData,
+                    signal: controller.signal
+                }
+            );
+
+    } finally {
+
+        clearTimeout(timeout);
+    }
+
+
+    /*
+     * fetch() only rejects on network-level failures.
+     * Explicitly check HTTP status.
+     */
+    if (!response.ok) {
+
+        const body =
+            await response.text();
+
+        throw new Error(
+            `HTTP ${response.status}: ${body.slice(0, 500)}`
+        );
+    }
+
+    /*
+     * n8n should return JSON.
+     * If it doesn't, successful HTTP status is still enough.
+     */
+    try {
+        return await response.json();
+    } catch {
+        return { ok: true };
+    }
+}
+
+
+/* ============================================================
+ * END CLASS
+ * ============================================================ */
+
+async function stopRecording() {
+
+    if (!isRecording) {
+        return;
+    }
+
+    isStopping = true;
+    isRecording = false;
+
+    clearInterval(vadInterval);
+    clearInterval(timerInterval);
+
+    vadInterval = null;
+    timerInterval = null;
+
+    recordIndicator.classList.remove("active");
+
+    setConnection("busy", "Finalizing");
+    setStatus(
+        "Stopping...",
+        "Finishing the current audio chunk."
+    );
+
+    /*
+     * Stop the current recorder.
+     */
+    if (
+        mediaRecorder &&
+        mediaRecorder.state !== "inactive"
+    ) {
+        mediaRecorder.stop();
+    } else {
+        await finalizeCurrentRecorderChunk();
+    }
+
+    /*
+     * Stop microphone.
+     */
+    if (stream) {
+        stream
+            .getTracks()
+            .forEach(track => track.stop());
+    }
+
+    /*
+     * Wait for the queue to upload everything.
+     *
+     * Do not tell n8n that the class is complete while
+     * local chunks are still pending.
+     */
+    await waitForQueueToDrain(120_000);
+
+    /*
+     * Tell n8n that recording has ended.
+     */
+    await sendEndClass();
+
+    cleanupMedia();
+
+    startBtn.style.display = "block";
+    stopBtn.style.display = "none";
+
+    setConnection("ready", "Ready");
+
+    setStatus(
+        "Class finalized",
+        "All available chunks were handed to n8n."
+    );
+
+    showToast("Class finalization started.");
+
+    updateQueueUI();
+}
+
+
+async function waitForQueueToDrain(timeoutMs) {
+
+    const started =
+        Date.now();
+
+    while (true) {
+
+        const pending =
+            queue.some(
+                item =>
+                    item.status !== "uploaded"
+            );
+
+        if (!pending) {
+            return true;
+        }
+
+        if (Date.now() - started > timeoutMs) {
+
+            setStatus(
+                "Network still processing",
+                "Pending chunks remain safely stored in this browser."
+            );
+
+            return false;
+        }
+
+        await new Promise(
+            resolve => setTimeout(resolve, 1000)
+        );
+
+        processUploadQueue();
+    }
+}
+
+
+async function sendEndClass() {
+
+    const classId =
+        classIdInput.value.trim();
+
+    if (!classId) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                CONFIG.endWebhook,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        class_id: classId,
+                        target_language: ""
+                    })
+                }
+            );
+
+        if (!response.ok) {
+
+            const body =
+                await response.text();
+
+            throw new Error(
+                `HTTP ${response.status}: ${body.slice(0, 500)}`
+            );
+        }
+
+    } catch (error) {
+
+        /*
+         * The audio is already persisted locally / in n8n.
+         * The finalization request can be retried manually
+         * without losing the lecture audio.
+         */
+        console.error(
+            "End-class request failed:",
+            error
+        );
+
+        showToast(
+            "Audio is safe, but finalization request failed."
+        );
+    }
+}
+
+
+/* ============================================================
+ * RECOVERY
+ * ============================================================ */
+
+async function restoreQueue() {
+
+    try {
+
+        const stored =
+            await dbGetAll();
+
+        queue = stored || [];
+
+        /*
+         * Any item that was uploading when the page died
+         * becomes retryable.
+         */
+        queue.forEach(item => {
+
+            if (item.status === "uploading") {
+                item.status = "retry";
+            }
+
+        });
+
+        for (const item of queue) {
+            await dbPut(item);
+        }
+
+        /*
+         * Continue the sequence after the highest local
+         * sequence number.
+         */
+        const maxSequence =
+            queue.reduce(
+                (max, item) =>
+                    Math.max(max, Number(item.sequence) || 0),
+                0
+            );
+
+        if (maxSequence > 0) {
+            sequence = maxSequence + 1;
+        }
+
+        updateQueueUI();
+
+        if (queue.length > 0) {
+            showToast(
+                `${queue.length} saved upload(s) restored.`
+            );
+
+            processUploadQueue();
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Queue restore failed:",
+            error
+        );
+    }
+}
+
+
+/* ============================================================
+ * NETWORK EVENTS
+ * ============================================================ */
+
+window.addEventListener(
+    "online",
+    () => {
+
+        setConnection(
+            isRecording ? "ready" : "",
+            isRecording ? "Connected" : "Ready"
+        );
+
+        processUploadQueue();
+    }
+);
+
+
+window.addEventListener(
+    "offline",
+    () => {
+
+        setConnection(
+            "error",
+            "Offline"
+        );
+
+        if (isRecording) {
+            setStatus(
+                "Offline",
+                "Recording continues. Chunks will stay in the local queue."
+            );
+        }
+    }
+);
+
+
+/* ============================================================
+ * CLEANUP
+ * ============================================================ */
+
+function cleanupMedia() {
+
+    if (vadInterval) {
+        clearInterval(vadInterval);
+    }
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    vadInterval = null;
+    timerInterval = null;
+
+    if (stream) {
+
+        stream
+            .getTracks()
+            .forEach(track => track.stop());
+    }
+
+    stream = null;
+    mediaRecorder = null;
+    analyser = null;
+    microphone = null;
+
+    if (audioContext) {
+        audioContext.close().catch(() => {});
+    }
+
+    audioContext = null;
+
+    meter.style.width = "0%";
+    chunkProgress.style.width = "0%";
+    vadState.textContent = "Waiting";
+}
+
+
+/* ============================================================
+ * BUTTONS
+ * ============================================================ */
+
+startBtn.addEventListener(
+    "click",
+    startRecording
+);
+
+stopBtn.addEventListener(
+    "click",
+    stopRecording
+);
+
+
+/* ============================================================
+ * PAGE START
+ * ============================================================ */
+
+(async function init() {
+
+    updateQueueUI();
+
+    await restoreQueue();
+
+    if (navigator.onLine) {
+        setConnection("", "Ready");
+    } else {
+        setConnection("error", "Offline");
+    }
+
+})();
 </script>
 </body>
 </html>
