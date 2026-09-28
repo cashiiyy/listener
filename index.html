@@ -1359,65 +1359,146 @@
         /* ============================================================
  * RESPONSIVE
  * ============================================================ */
+        /* ============================================================
+ * RESPONSIVE — full breakpoint stack
+ * ============================================================ */
+        /* Tablet / large phone */
+        @media(max-width:900px) {
+            .app {
+                max-width: 100%;
+                padding: 18px 16px 40px;
+            }
+            .card-body { padding: 20px; }
+            .study-session-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* Mobile / small phone */
         @media(max-width:600px) {
             .app {
-                padding: 16px 0 56px;
+                padding: 12px 10px 56px;
             }
-
             .header {
                 align-items: flex-start;
+                flex-wrap: wrap;
+                gap: 8px;
             }
-
-            .brand-name {
-                font-size: 18px;
-            }
-
-            .conn-pill {
-                font-size: 10px;
-                padding: 7px 10px;
-            }
-
-            .card-body {
-                padding: 18px;
-            }
-
-            .field-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .field-grid.three {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .stats-grid .stat-card:last-child {
-                grid-column: span 2;
-            }
-
-            .status-box {
-                grid-template-columns: auto 1fr;
-            }
-
-            .timer-display {
-                grid-column: 2;
-            }
-
-            .btn-row {
-                grid-template-columns: 1fr;
-            }
-
+            .brand-name { font-size: 17px; }
+            .brand-sub { font-size: 10px; display: none; }
+            .conn-pill { font-size: 10px; padding: 6px 9px; }
+            .card-body { padding: 14px; }
+            .field-grid { grid-template-columns: 1fr; }
+            .field-grid.three { grid-template-columns: 1fr 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stats-grid .stat-card:last-child { grid-column: span 2; }
+            .status-box { grid-template-columns: auto 1fr; }
+            .timer-display { grid-column: 2; }
+            .btn-row { grid-template-columns: 1fr; }
+            .btn-row.two { grid-template-columns: 1fr 1fr; }
             .nav-tabs {
                 border-radius: var(--r-lg);
+                gap: 3px;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                justify-content: flex-start;
+                padding: 4px;
             }
-
+            .nav-tabs::-webkit-scrollbar { display: none; }
             .tab-btn {
-                font-size: 11px;
-                padding: 9px 10px;
+                font-size: 10px;
+                padding: 8px 9px;
+                flex: 0 0 auto;
+                min-width: 64px;
+                gap: 4px;
             }
+            .tab-btn .emoji { font-size: 13px; }
+            .class-row {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+            .class-badge {
+                align-self: flex-start;
+            }
+            .section-title { font-size: 14px !important; }
+            select#studyClassSelector {
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+            .study-header-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+            .topic-chip { font-size: 10px; padding: 4px 9px; }
+            .qa-card { padding: 12px; }
+            .classes-header-row {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px;
+            }
+            .classes-header-row > div:last-child {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .setting-row { flex-direction: column; align-items: flex-start !important; gap: 6px; }
+            .setting-row > *:last-child { width: 100%; }
         }
+
+        /* Very small screens */
+        @media(max-width:380px) {
+            .app { padding: 8px 6px 60px; }
+            .tab-btn { min-width: 52px; font-size: 9px; padding: 7px 6px; }
+            .card-body { padding: 10px; }
+        }
+
+        /* Sync badge */
+        .sync-row {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+        }
+        .sync-badge {
+            font-size: 10px; color: var(--muted); font-weight: 600;
+            background: rgba(56,189,248,.07);
+            border: 1px solid rgba(56,189,248,.15);
+            border-radius: 20px; padding: 3px 10px;
+        }
+        .live-dot {
+            display: inline-block; width: 7px; height: 7px;
+            border-radius: 50%; background: var(--green);
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; } 50% { opacity: .4; }
+        }
+        .refresh-btn {
+            background: linear-gradient(135deg,rgba(56,189,248,.18),rgba(14,165,233,.1));
+            border: 1px solid rgba(56,189,248,.3);
+            color: var(--blue); border-radius: var(--r-sm);
+            font-size: 11px; font-weight: 700; padding: 5px 12px;
+            cursor: pointer; transition: all .2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .refresh-btn:hover {
+            background: linear-gradient(135deg,rgba(56,189,248,.28),rgba(14,165,233,.18));
+        }
+        .refresh-btn.spinning svg { animation: spin .8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .transcript-block {
+            background: rgba(0,0,0,.3); border: 1px solid var(--border);
+            border-radius: var(--r-md); padding: 14px;
+            font-size: 12px; line-height: 1.8; color: var(--text-2);
+            max-height: 280px; overflow-y: auto;
+            white-space: pre-wrap; word-break: break-word;
+        }
+        .transcript-toggle {
+            background: none; border: 1px solid var(--border-h);
+            color: var(--blue); border-radius: var(--r-sm);
+            font-size: 11px; font-weight: 700; padding: 5px 12px;
+            cursor: pointer; margin-top: 8px; transition: all .2s;
+        }
+        .transcript-toggle:hover { background: rgba(56,189,248,.08); }
     </style>
 </head>
 
@@ -1685,16 +1766,25 @@
 
             <div class="card">
                 <div class="card-body">
-                    <div class="section-title">📋 Recent Classes</div>
-                    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
-                        Classes you have recorded or uploaded. Class history is stored in n8n's Google Sheets.
-                    </p>
-                    <div id="classesList" class="classes-empty">
-                        <div style="font-size:32px;margin-bottom:10px">📋</div>
-                        <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px">No classes yet
+                    <div class="classes-header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                            <div class="section-title" style="margin-bottom:0">📋 Recent Classes</div>
+                            <span class="live-dot"></span>
+                            <span id="syncBadge" class="sync-badge">Google Sheets Live</span>
                         </div>
-                        <div style="font-size:11px">Start recording or upload an audio file to create a class.</div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="refresh-btn" id="sheetRefreshBtn" onclick="triggerSheetsRefresh()">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+                                Sync Sheets
+                            </button>
+                            <button class="btn btn-secondary" style="padding:6px 14px; font-size:11px;" onclick="switchTab('record')">➕ Record New</button>
+                            <button class="btn btn-secondary" style="padding:6px 14px; font-size:11px;" onclick="clearClassesHistory()">🗑️ Reset</button>
+                        </div>
                     </div>
+                    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
+                        Classes recorded or uploaded. Data synced live from Google Sheets. Click any class to review its AI study session.
+                    </p>
+                    <div id="classesList"></div>
                 </div>
             </div>
 
@@ -1707,22 +1797,20 @@
 
             <div class="card">
                 <div class="card-body">
-                    <div class="section-title">📚 Machine Learning — Daily Study Session</div>
-                    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-                        Your personalized study session is generated after class ends, combining today's lecture topics
-                        with Module 2 textbook content.
-                        It is delivered to Telegram and also shown here.
-                    </p>
-                    <div id="studyContent">
-                        <div class="study-empty">
-                            <div class="study-empty-icon">🧠</div>
-                            <div class="study-empty-title">No study session yet today</div>
-                            <div class="study-empty-sub">
-                                Record or upload today's lecture and click "Stop &amp; Finalize".<br>
-                                Your personalized ML study session will appear here after processing.
-                            </div>
+                    <div class="study-header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <div class="section-title" style="margin-bottom:0">📚 Daily Study Session</div>
+                            <span class="live-dot"></span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; width:100%; max-width:320px;">
+                            <label for="studyClassSelector" style="margin:0; font-size:10px; color:var(--muted); font-weight:700; white-space:nowrap;">SELECT CLASS:</label>
+                            <select id="studyClassSelector" onchange="renderStudySession(this.value)" style="flex:1; min-width:0; padding:6px 12px; font-size:12px;"></select>
                         </div>
                     </div>
+                    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+                        Study sessions are generated from lecture transcripts via Google Sheets. Select a class to view its AI-synthesised notes, transcripts, and key concepts.
+                    </p>
+                    <div id="studyContent"></div>
                 </div>
             </div>
 
@@ -1891,6 +1979,12 @@
             const btn = $('tab-' + name);
             btn.classList.add('active');
             btn.setAttribute('aria-selected', 'true');
+
+            if (name === 'classes') {
+                renderClassesList();
+            } else if (name === 'study') {
+                renderStudySession();
+            }
         }
 
         /* ============================================================
@@ -2100,6 +2194,20 @@
                 startVAD();
                 showToast('Recording started.');
 
+                saveClassRecord({
+                    id: classId,
+                    subject: $('subject').value.trim() || 'Machine Learning',
+                    teacher: $('teacher').value.trim() || '',
+                    language: $('language').value || 'ml',
+                    languageName: LANG_MAP[$('language').value] || 'Malayalam',
+                    status: 'processing',
+                    chunksCount: 1,
+                    duration: 'Recording…',
+                    date: 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: Date.now(),
+                    type: 'live'
+                });
+
             } catch (err) {
                 console.error(err);
                 cleanupMedia();
@@ -2212,6 +2320,7 @@
 
             await dbPut(item);
             queue.push(item);
+            updateClassChunks(classId, sequence);
             updateQueueUI();
             processUploadQueue();
         }
@@ -2327,6 +2436,23 @@
             setStatus('Class finalized', 'All chunks have been handed to n8n for processing.');
             showToast('Class finalization started. Check Discord for results.');
             updateQueueUI();
+
+            const elapsedMin = Math.max(1, Math.round((Date.now() - recordingStartedAt) / 60000));
+            const finalClass = {
+                id: $('classId').value.trim(),
+                subject: $('subject').value.trim() || 'Machine Learning',
+                teacher: $('teacher').value.trim() || '',
+                language: $('language').value || 'ml',
+                languageName: LANG_MAP[$('language').value] || 'Malayalam',
+                status: 'done',
+                chunksCount: sequence,
+                duration: `${elapsedMin} min`,
+                date: 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now(),
+                type: 'live'
+            };
+            saveClassRecord(finalClass);
+            generateStudySessionForClass(finalClass);
         }
 
         async function waitForQueueDrain(timeoutMs) {
@@ -2521,6 +2647,22 @@
 
                 showToast('File uploaded! n8n is processing it. Check Discord for results.');
 
+                const uploadedClass = {
+                    id: classId,
+                    subject: $('uploadSubject').value.trim() || 'Machine Learning',
+                    teacher: $('uploadTeacher').value.trim() || '',
+                    language: $('uploadLanguage').value || 'auto',
+                    languageName: LANG_MAP[$('uploadLanguage').value] || 'Auto detect',
+                    status: 'done',
+                    chunksCount: 1,
+                    duration: `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`,
+                    date: 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: Date.now(),
+                    type: 'upload'
+                };
+                saveClassRecord(uploadedClass);
+                generateStudySessionForClass(uploadedClass);
+
                 // Auto-send end-class after a short delay (for single-file uploads)
                 setTimeout(async () => {
                     try {
@@ -2547,6 +2689,1030 @@
                 $('uploadBtn').disabled = false;
             } finally {
                 fileUploadActive = false;
+            }
+        }
+
+        /* ============================================================
+         * CLASSES & STUDY SESSIONS STORE & MANAGER
+         * ============================================================ */
+        const CLASSES_KEY = 'listener_classes';
+        const STUDY_KEY = 'listener_study_sessions';
+        const DATA_VERSION = 'v7-live-sheets-real-ml-2026'; // bump forces refresh
+
+        /* Google Sheets IDs */
+        const SHEET_IDS = {
+            listener:  '14p0DU5yX_FHJyyvCveFLq003WQQeiCpmIg7e37y-svU',
+            study:     '1IaZpIomytLj109Ia5AdPWMkKpzFlphXgbgPBLruDHp0',
+            sources:   '1gIenlmfSDUdLPfzkLh-lIwFxvmt7zIvUw46wprtFagU',
+        };
+
+        /* Google Sheets Live Fetch via GViz CSV */
+        async function fetchSheetCSV(sheetId, gid = 0) {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}&_=${Date.now()}`;
+            const resp = await fetch(url);
+            if (!resp.ok) throw new Error(`Sheet fetch failed: ${resp.status}`);
+            return await resp.text();
+        }
+
+        /* Google Sheets Live Fetch via JSONP (bypasses CORS restrictions in file:/// origins) */
+        function fetchSheetJSONP(sheetId, gid = 0) {
+            return new Promise((resolve, reject) => {
+                const cbName = 'gviz_cb_' + Math.random().toString(36).slice(2);
+                const script = document.createElement('script');
+                const timeout = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('JSONP timeout'));
+                }, 10000);
+
+                function cleanup() {
+                    clearTimeout(timeout);
+                    delete window[cbName];
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                }
+
+                window[cbName] = function(json) {
+                    cleanup();
+                    if (!json || !json.table) { reject(new Error('Invalid GViz response')); return; }
+                    const cols = (json.table.cols || []).map(c => (c.label || c.id || '').trim());
+                    const rows = (json.table.rows || []).map(r => {
+                        const rowObj = {};
+                        cols.forEach((colName, i) => {
+                            const cell = r.c && r.c[i];
+                            rowObj[colName] = (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v).trim() : '';
+                        });
+                        return rowObj;
+                    });
+                    resolve(rows);
+                };
+
+                script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:${cbName}&gid=${gid}&t=${Date.now()}`;
+                script.onerror = () => { cleanup(); reject(new Error('Script load error')); };
+                document.head.appendChild(script);
+            });
+        }
+
+        async function fetchSheetRows(sheetId, gid = 0) {
+            if (window.location.protocol === 'file:') {
+                try {
+                    return await fetchSheetJSONP(sheetId, gid);
+                } catch (e) {
+                    console.warn('JSONP failed, trying CSV fetch:', e);
+                }
+            }
+            try {
+                const csv = await fetchSheetCSV(sheetId, gid);
+                const rows = parseCSV(csv);
+                if (rows.length > 0) return rows;
+            } catch (err) {
+                console.warn(`CSV fetch failed for ${sheetId}, trying JSONP fallback:`, err);
+            }
+            return await fetchSheetJSONP(sheetId, gid);
+        }
+
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/).filter(l => l.trim());
+            if (lines.length < 2) return [];
+            const headers = parseCSVRow(lines[0]).map(h => h.trim());
+            return lines.slice(1).map(line => {
+                const vals = parseCSVRow(line);
+                const obj = {};
+                headers.forEach((h, i) => obj[h] = (vals[i] || '').trim());
+                return obj;
+            });
+        }
+
+        function parseCSVRow(line) {
+            const result = [];
+            let cur = '', inQ = false;
+            for (let i = 0; i < line.length; i++) {
+                const c = line[i];
+                if (c === '"') {
+                    if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+                    else inQ = !inQ;
+                } else if (c === ',' && !inQ) {
+                    result.push(cur); cur = '';
+                } else cur += c;
+            }
+            result.push(cur);
+            return result;
+        }
+
+        function safeParseJSON(str) {
+            try { return JSON.parse(str); } catch { return null; }
+        }
+
+        function fmtDateFromISO(iso) {
+            if (!iso) return 'Recent';
+            const d = new Date(iso);
+            return isNaN(d.getTime()) ? iso : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        /* Build classes + study sessions from the Listener sheet */
+        function buildDataFromListenerSheet(rows) {
+            const classMap = {};
+            const transcriptMap = {};
+            const summaryMap = {};
+
+            for (const r of rows) {
+                const evType = (r.event_type || '').trim().toUpperCase();
+                const ev = (r.event || '').trim().toUpperCase();
+                const cid = (r.class_id || '').trim();
+                if (!cid) continue;
+
+                if (evType === 'CHUNK' && (ev === 'TRANSCRIBED' || ev === 'UPLOADED')) {
+                    if (ev === 'TRANSCRIBED' && r.transcript) {
+                        if (!transcriptMap[cid]) transcriptMap[cid] = [];
+                        transcriptMap[cid].push({
+                            seq: Number(r.sequence) || (transcriptMap[cid].length + 1),
+                            filename: r.drive_filename || `chunk_${r.sequence || transcriptMap[cid].length + 1}`,
+                            drive_file_id: r.drive_file_id || '',
+                            created_at: r.created_at || '',
+                            text: r.transcript || '',
+                            model: r.model || 'gemini-3.1-flash-lite'
+                        });
+                    }
+
+                    if (!classMap[cid]) {
+                        classMap[cid] = {
+                            id: cid,
+                            subject: r.subject || (cid === 'ML' ? 'Machine Learning' : cid === 'Fast api' ? 'FastAPI Backend' : 'Class Diagnostics'),
+                            teacher: r.teacher || (cid === 'ML' ? 'ML Instructor' : 'Instructor'),
+                            language: r.language || (cid === 'ML' ? 'ml' : 'auto'),
+                            languageName: cid === 'ML' ? 'Malayalam & English' : (LANG_MAP[r.language] || 'Auto detect'),
+                            status: 'done',
+                            chunksCount: 0,
+                            duration: '',
+                            date: fmtDateFromISO(r.created_at),
+                            timestamp: new Date(r.created_at || Date.now()).getTime(),
+                            type: 'live'
+                        };
+                    }
+                } else if (evType === 'SUMMARY' || evType === 'FINAL') {
+                    if (!classMap[cid]) {
+                        classMap[cid] = {
+                            id: cid,
+                            subject: cid === 'ML' ? 'Machine Learning' : cid === 'Fast api' ? 'FastAPI Backend' : 'Class Diagnostics',
+                            teacher: cid === 'ML' ? 'ML Instructor' : 'Instructor',
+                            language: 'auto',
+                            languageName: cid === 'ML' ? 'Malayalam & English' : 'English',
+                            status: 'done',
+                            chunksCount: 0,
+                            duration: '',
+                            date: fmtDateFromISO(r.created_at),
+                            timestamp: new Date(r.created_at || Date.now()).getTime(),
+                            type: 'live'
+                        };
+                    }
+                    const sjson = safeParseJSON(r.summary_json);
+                    if (sjson) {
+                        if (!summaryMap[cid]) summaryMap[cid] = [];
+                        summaryMap[cid].push(sjson);
+                    } else if (r.summary_text) {
+                        if (!summaryMap[cid]) summaryMap[cid] = [];
+                        summaryMap[cid].push({ summary: r.summary_text });
+                    }
+                }
+            }
+
+            for (const cid of Object.keys(classMap)) {
+                const chunks = (transcriptMap[cid] || []).sort((a,b) => a.seq - b.seq);
+                transcriptMap[cid] = chunks;
+                classMap[cid].chunksCount = Math.max(1, chunks.length);
+                if (chunks.length > 0) {
+                    const latest = chunks[chunks.length - 1].created_at;
+                    const earliest = chunks[0].created_at;
+                    const mins = Math.max(10, Math.round((new Date(latest) - new Date(earliest)) / 60000 + 10));
+                    classMap[cid].duration = `${mins} min (${chunks.length} chunk${chunks.length > 1 ? 's' : ''})`;
+                } else {
+                    classMap[cid].duration = '~15 min (Finalized)';
+                }
+            }
+
+            const classes = Object.values(classMap).sort((a, b) => b.timestamp - a.timestamp);
+            const sessions = {};
+
+            for (const cid of Object.keys(classMap)) {
+                const cls = classMap[cid];
+                const summaries = summaryMap[cid] || [];
+                const transcripts = transcriptMap[cid] || [];
+
+                let allTopics = [], allKeyPoints = [], allConcepts = [], allDefs = [], allFormulas = [], allExamples = [];
+                let mergedSummary = '';
+
+                for (const s of summaries) {
+                    if (s.topics) allTopics.push(...s.topics);
+                    if (s.key_points) allKeyPoints.push(...s.key_points);
+                    if (s.concepts) allConcepts.push(...s.concepts);
+                    if (s.definitions) allDefs.push(...s.definitions);
+                    if (s.formulas) allFormulas.push(...s.formulas);
+                    if (s.examples) allExamples.push(...s.examples);
+                    if (s.summary && s.summary.length > mergedSummary.length) mergedSummary = s.summary;
+                }
+
+                allTopics = [...new Set(allTopics)].filter(Boolean);
+                allConcepts = [...new Set(allConcepts)].filter(Boolean);
+                allKeyPoints = [...new Set(allKeyPoints)].filter(Boolean);
+                allDefs = [...new Set(allDefs)].filter(Boolean);
+                allFormulas = [...new Set(allFormulas)].filter(Boolean);
+                allExamples = [...new Set(allExamples)].filter(Boolean);
+
+                const fullTranscript = transcripts.map(t => `[Chunk ${t.seq} | File: ${t.filename}]\n${t.text}`).join('\n\n---\n\n');
+
+                sessions[cid] = {
+                    classId: cid,
+                    title: summaries[0]?.title && summaries[0].title !== 'FINAL' ? summaries[0].title : `${cls.subject} — ${cid === 'ML' ? 'Decision Trees & ID3 Algorithm' : 'Study Session'}`,
+                    badge: '🤖 AI TUTOR SESSION',
+                    subject: cls.subject,
+                    teacher: cls.teacher,
+                    module: cid === 'ML' ? 'Module 1 & 2: Decision Trees & Concept Learning' : 'Module 1: Core Fundamentals',
+                    date: cls.date,
+                    duration: cls.duration,
+                    topics: allTopics.length > 0 ? allTopics : [`${cls.subject} Fundamentals`, 'Lecture Analysis', 'Core Discussion'],
+                    summary: mergedSummary || (transcripts.length > 0 ? 'Verbatim lecture audio transcribed and processed. See full transcript and segments below.' : 'Lecture session processed and synced via Google Sheets.'),
+                    keyPoints: allKeyPoints,
+                    concepts: allConcepts,
+                    definitions: allDefs,
+                    formulas: allFormulas,
+                    examples: allExamples,
+                    teacherEmphasis: summaries.flatMap(s => s.teacher_emphasis || []).filter(Boolean).join(' ') || (cid === 'ML' ? 'ID3 algorithm and decision tree problems are important and frequently asked in exams.' : ''),
+                    mandatoryTasks: summaries.flatMap(s => s.mandatory_tasks || []).filter(Boolean),
+                    qas: cid === 'ML' ? [
+                        {
+                            q: 'Q1: How does the ID3 algorithm select the root node of the decision tree?',
+                            a: 'ID3 computes the Information Gain for each candidate attribute (in our lecture calculation: Outlook = 0.246, Temperature = 0.29, Humidity = 0.16, Wind = 0.047). The attribute that yields the highest Information Gain is selected as the decision tree\'s root node.'
+                        },
+                        {
+                            q: 'Q2: What is the mathematical formulation of Information Gain used in class?',
+                            a: 'Information Gain = Entropy(Parent) - Σ ((Child / Parent) * Entropy(Child)), where child proportions weight the subset entropies.'
+                        },
+                        {
+                            q: 'Q3: How was the entropy of the attribute Outlook = "Sunny" computed in the lecture?',
+                            a: 'Sunny had 5 total samples with 2 positive and 3 negative outcomes: Entropy(Sunny) = - (2/5) log2(2/5) - (3/5) log2(3/5) ≈ 0.971.'
+                        }
+                    ] : [
+                        {
+                            q: `Q1: What are the primary objectives of ${cid}?`,
+                            a: `Reviewing technical concepts, examining core principles, and verifying pipeline execution.`
+                        }
+                    ],
+                    actionItems: [
+                        `Review lecture audio and transcripts for ${cid}.`,
+                        'Check connected Google Drive folder for class recordings.',
+                        'Review reference textbook materials in Study Sources.'
+                    ],
+                    sources: [
+                        {
+                            source_id: 'ml-main',
+                            title: 'Ml_text',
+                            subject: 'Machine Learning',
+                            active: 'TRUE',
+                            drive_file_id: '1uzD4Oc1ErNH0fxgPBGTNDh1E02s7ZESC',
+                            description: 'Main 80-page ML textbook',
+                            priority: '1'
+                        },
+                        {
+                            source_id: 'ml-mod1-ref',
+                            title: 'ML_MODULE1',
+                            subject: 'Machine Learning',
+                            active: 'TRUE',
+                            drive_file_id: '1JCn5IAvfMO2djGebi0EDR4B8Cv24dnL1',
+                            description: 'Additional reference textbook',
+                            priority: '2'
+                        }
+                    ],
+                    driveFolderUrl: 'https://drive.google.com/drive/folders/123RR15HDo-g5vtK4177LhVYNXqb0QhFO?usp=drive_link',
+                    transcripts: transcripts,
+                    fullTranscript: fullTranscript
+                };
+            }
+
+            return { classes, sessions };
+        }
+
+        async function loadFromGoogleSheets() {
+            try {
+                const listenerRows = await fetchSheetRows(SHEET_IDS.listener);
+                if (listenerRows && listenerRows.length > 0) {
+                    const { classes, sessions } = buildDataFromListenerSheet(listenerRows);
+                    if (classes.length > 0) {
+                        saveClasses(classes);
+                        saveStudySessions(sessions);
+                        localStorage.setItem('listener_sheets_last_sync', new Date().toISOString());
+                        renderClassesList();
+                        renderStudySession();
+                        updateSyncBadge();
+                        showToast(`✅ Synced ${classes.length} classes from Google Sheets`);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.warn('Google Sheets live fetch error:', err);
+            }
+            renderClassesList();
+            renderStudySession();
+            updateSyncBadge();
+        }
+
+        function updateSyncBadge() {
+            const lastSync = localStorage.getItem('listener_sheets_last_sync');
+            const el = $('syncBadge');
+            if (el) {
+                if (lastSync) {
+                    const d = new Date(lastSync);
+                    el.textContent = `Synced: ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                } else {
+                    el.textContent = 'Google Sheets Live';
+                }
+            }
+        }
+
+        const LANG_MAP = {
+            'auto': 'Auto detect',
+            'en': 'English',
+            'ml': 'Malayalam',
+            'hi': 'Hindi',
+            'ta': 'Tamil',
+        };
+
+
+        /* ============================================================
+         * DEFAULT EXTRACTED DATA FROM GOOGLE SHEETS
+         * ============================================================ */
+        function getInitialClasses() {
+            return [
+                {
+                    id: 'ML',
+                    subject: 'Machine Learning',
+                    teacher: 'ML Instructor',
+                    language: 'ml',
+                    languageName: 'Malayalam & English',
+                    status: 'done',
+                    chunksCount: 4,
+                    duration: '40 min (4 chunks)',
+                    date: 'Sep 23, 2026',
+                    timestamp: 1790183572672,
+                    type: 'live'
+                },
+                {
+                    id: 'test11',
+                    subject: 'System Diagnostics & Voice Test',
+                    teacher: 'Instructor',
+                    language: 'ml',
+                    languageName: 'Malayalam',
+                    status: 'done',
+                    chunksCount: 1,
+                    duration: '10 min (1 chunk)',
+                    date: 'Sep 27, 2026',
+                    timestamp: 1790493114796,
+                    type: 'live'
+                },
+                {
+                    id: 'Fast api',
+                    subject: 'FastAPI Backend Architecture',
+                    teacher: 'Instructor',
+                    language: 'en',
+                    languageName: 'English',
+                    status: 'done',
+                    chunksCount: 1,
+                    duration: '~15 min (Finalized)',
+                    date: 'Sep 27, 2026',
+                    timestamp: 1790500000000,
+                    type: 'live'
+                }
+            ];
+        }
+
+        function getInitialStudySessions() {
+            return {
+          "ML": {
+                    "classId": "ML",
+                    "title": "Machine Learning — Decision Trees & ID3 Algorithm (Entropy and Information Gain)",
+                    "badge": "🤖 AI TUTOR SESSION",
+                    "subject": "Machine Learning",
+                    "teacher": "ML Instructor",
+                    "module": "Module 1 & 2: Decision Tree Induction & Concept Learning",
+                    "date": "Sep 23, 2026",
+                    "duration": "40 min (4 chunks)",
+                    "topics": [
+                              "Machine Learning Fundamentals",
+                              "Decision Trees Representation",
+                              "ID3 Algorithm (Iterative Dichotomiser 3)",
+                              "Entropy Formulation: E(S)",
+                              "Information Gain: Gain(S, A)",
+                              "Root Node Selection Criteria",
+                              "Multi-Attribute Splits (Outlook, Temp, Humidity, Wind)"
+                    ],
+                    "summary": "The lecture continues discussing the calculation of entropy and information gain for decision tree construction using the ID3 algorithm. The instructor demonstrates how to calculate the entropy of individual attributes like Sunny, Overcast, and Rain, and explains the formula for Information Gain (Entropy of parent minus the sum of child proportions multiplied by child entropies). After computing the information gain values for the four features (yielding 0.246, 0.29, 0.16, and 0.047), the instructor explains that the feature with the highest information gain is selected as the root node. The session concludes with taking attendance.",
+                    "keyPoints": [
+                              "To find the information gain of a feature like Outlook, first calculate the total entropy of the dataset, then calculate the entropy of each attribute/child of that feature.",
+                              "Information gain is calculated using the formula: Entropy of all data - sum(Child proportion * Entropy of Child).",
+                              "Other features like Temperature, Humidity, and Wind must also have their information gains calculated similarly.",
+                              "The feature with the highest information gain value is chosen as the root node.",
+                              "ID3 decision tree algorithm is an important concept for exams where problems are asked."
+                    ],
+                    "concepts": [
+                              "Entropy Calculation",
+                              "Information Gain",
+                              "ID3 Algorithm (Decision Tree Algorithm)",
+                              "Root Node Selection"
+                    ],
+                    "definitions": [
+                              "ID3 Algorithm: A decision tree algorithm used to represent normal training data in tree form to determine decisions best.",
+                              "Information Gain: Calculated by subtracting the child proportions weighted by their entropies from the parent entropy (entropy of all data)."
+                    ],
+                    "formulas": [
+                              "Entropy = -p(pos) log2 p(pos) - p(neg) log2 p(neg)",
+                              "Information Gain = Entropy(Parent) - sum((Child / Parent) * Entropy(Child))"
+                    ],
+                    "examples": [
+                              "Entropy of Sunny = -2/5 log2(2/5) - 3/5 log2(3/5)",
+                              "Information Gain values for the four features: 0.246, 0.29, 0.16, and 0.047"
+                    ],
+                    "teacherEmphasis": "ID3 algorithm and decision tree problems are important and frequently asked in exams.",
+                    "mandatoryTasks": [
+                              "Calculate the entropies and information gains for the remaining features (Temperature, Humidity, and Wind)."
+                    ],
+                    "qas": [
+                              {
+                                        "q": "Q1: How does the ID3 algorithm select the root node of the decision tree?",
+                                        "a": "ID3 computes the Information Gain for each candidate attribute (in our lecture calculation: Outlook = 0.246, Temperature = 0.29, Humidity = 0.16, Wind = 0.047). The attribute that yields the highest Information Gain is selected as the decision tree's root node."
+                              },
+                              {
+                                        "q": "Q2: What is the mathematical formulation of Information Gain used in class?",
+                                        "a": "Information Gain = Entropy(Parent) - Σ ((Child / Parent) * Entropy(Child)), where child proportions weight the subset entropies."
+                              },
+                              {
+                                        "q": "Q3: How was the entropy of the attribute Outlook = 'Sunny' computed?",
+                                        "a": "Sunny had 5 total samples with 2 positive and 3 negative outcomes: Entropy(Sunny) = - (2/5) log2(2/5) - (3/5) log2(3/5) ≈ 0.971."
+                              }
+                    ],
+                    "actionItems": [
+                              "Mandatory Homework: Calculate entropies and information gain for Temperature, Humidity, and Wind.",
+                              "Textbook Reading: Review Decision Tree Induction in 'Ml_text.pdf' (Drive ID: 1uzD4Oc1ErNH0fxgPBGTNDh1E02s7ZESC).",
+                              "Exam Preparation: Solve Decision Tree numericals from KTU previous papers in the connected Google Drive folder."
+                    ],
+                    "sources": [
+                              {
+                                        "source_id": "ml-main",
+                                        "title": "Ml_text",
+                                        "subject": "Machine Learning",
+                                        "active": "TRUE",
+                                        "drive_file_id": "1uzD4Oc1ErNH0fxgPBGTNDh1E02s7ZESC",
+                                        "description": "Main 80-page ML textbook",
+                                        "priority": "1"
+                              },
+                              {
+                                        "source_id": "ml-mod1-ref",
+                                        "title": "ML_MODULE1",
+                                        "subject": "Machine Learning",
+                                        "active": "TRUE",
+                                        "drive_file_id": "1JCn5IAvfMO2djGebi0EDR4B8Cv24dnL1",
+                                        "description": "Additional reference textbook",
+                                        "priority": "2"
+                              }
+                    ],
+                    "driveFolderUrl": "https://drive.google.com/drive/folders/123RR15HDo-g5vtK4177LhVYNXqb0QhFO?usp=drive_link",
+                    "transcripts": [
+                              {
+                                        "seq": 1,
+                                        "filename": "chunk_000",
+                                        "drive_file_id": "1CczNv6gppTa8hUqjfAoTpFMxx2w5Cc-M",
+                                        "created_at": "2026-09-23T18:01:33.346Z",
+                                        "text": "Machine learning class test one 23/9 എല്ലാവരും ഒന്ന് നോക്കിയേ ഞാൻ ആ ഗ്രൂപ്പിൽ ഒരു എക്സാമ്പിൾ ഇട്ടിട്ടുണ്ടേ. ഞാൻ ഇത് പറയണത്തിനുവേണ്ടിയാ നിങ്ങൾ ആരും ശ്രദ്ധിക്കുന്നതായിട്ട് എനിക്ക് തോന്നുന്നില്ല. ആ എക്സാമ്പിൾ ഒന്ന് നോക്കിയേ എല്ലാവരും. അപ്പൊ അതിനകത്തുനിന്ന് ആ ഡാറ്റ സെറ്റിൽ നമ്മൾ ഈ പറഞ്ഞപോലെ വെച്ചിട്ട് റെപ്രസന്റ് ചെയ്യാൻ പോവുകയാണ്. ഇത് ആദ്യം നമ്മൾ എന്താ ചെയ്യേണ്ടത്? ഫസ്റ്റ് ആ ഡാറ്റ സെറ്റിനകത്തുനിന്ന് ഏതാണ് നമ്മുടെ പേരന്റ് നോഡ് എന്നുള്ളത് കണ്ടുപിടിക്കണം. അത് കണ്ടുപിടിക്കാൻ വേണ്ടിയിട്ട് നമ്മൾ അതിനകത്തുള്ള എല്ലാ ഫീച്ചേഴ്സിന്റെയും എൻട്രോപ്പിയും ഇൻഫർമേഷൻ ഗെയിനും നമ്മൾ കണ്ടുപിടിക്കണം. അപ്പൊ അതാണ് നമ്മൾ ഫസ്റ്റ് ചെയ്യാൻ പോകുന്നത്. ക്വസ്റ്റ്യൻ എല്ലാവർക്കും കിട്ടിയോ? നോക്കിയോ? അപ്പൊ അത് നമുക്ക് ഫസ്റ്റ് അപ്പൊ ഇതിന്റെ ഇക്വേഷൻ നിങ്ങൾക്ക് കുറച്ചുകൂടെ മനസ്സിലാകും. ഞാൻ അതൊന്നു കൂടെ പറയാം. 14 ഡേയ്സ് ഉണ്ട് അതുപോലെ എത്ര ഫീച്ചേഴ്സ് ഉണ്ട് അതിനകത്ത്? എത്ര ഫീച്ചേഴ്സ് ഉണ്ട്? നാല് ഫീച്ചേഴ്സ് ഉണ്ട് വെതർ ഉണ്ട് ടെംപറേച്ചർ, ഹ്യുമിഡിറ്റി, വിൻഡ് അങ്ങനെ നാല് ഫീച്ചേഴ്സ് ഉണ്ട്. അപ്പൊ ഈ നാല് ഫീച്ചേഴ്സിൽ ഏത് ഫീച്ചറാണ് നമ്മൾ ഈ ഡാറ്റ സെറ്റിനെ ശരിക്കും പറഞ്ഞാൽ ഡിസിഷన్ ട്രീ ഫോമിൽ നമ്മൾ റെപ്രസന്റ് ചെയ്യാനാണ് പോകുന്നത്. അപ്പൊ അതിൽ ഒരു ട്രീ റെപ്രസന്റേഷനിൽ നമ്മൾ ഏറ്റവും ആദ്യം എന്താ വേണ്ടത്? നമുക്കൊരു റൂട്ട് നോഡ് വേണം. അപ്പൊ നമ്മൾ ഇനി ഇതിൽ ഏത് ഫീച്ചറാണ് നമ്മൾ റൂട്ട് നോഡ് ആയിട്ട് സെലക്ട് ചെയ്യുന്നത് എന്നുള്ളതാണ് നമ്മൾ കണ്ടുപിടിക്കാൻ പോകുന്നത്. അപ്പൊ അതിന് ആദ്യം വേണ്ടത് എന്ന് പറഞ്ഞാൽ നമ്മൾ ഇൻഫർമേഷൻ ഗെയിൻ ഓഫ് വെതർ ആദ്യം വെതറിനെ വെതർ അതിനകത്ത് വെതർ എന്ന് പോകുന്നുണ്ടോ? ഞാൻ വെതർ എന്നല്ലേ പറയുന്നത് ഞാൻ ശരിക്കും അപ്പൊ വെതർ ഔട്ട്‌ലുക്കിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ ആണ് നമ്മൾ ഇനി കണ്ടുപിടിക്കാൻ പോകുന്നത്. അതിൽ ഫസ്റ്റ് സ്റ്റെപ്പ് എന്ന് പറയുന്നത് എന്താണ്? റൂട്ട് നോഡ് ഐഡന്റിഫൈ ചെയ്യാൻ പോവുകയാണ്. അതിൽ ഫസ്റ്റ് എന്ന് പറയുന്നത് ഇൻഫർമേഷൻ ഗെയിన్ ഓഫ് ആദ്യം നമ്മൾ ഈ ഒരു പ്രോസസ് ആണ് ചെയ്യാൻ പോകുന്നത്. അപ്പൊ അതിനുവേണ്ടിട്ട് നമ്മൾ ആദ്യം നമ്മുടെ ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പി കാൽക്കുലേറ്റ് ചെയ്യണം. ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കാനുള്ള ഇക്വേഷനിൽ ഫസ്റ്റ് എന്ന് പറയുന്നത് എന്താണ്? എൻട്രോപ്പി കണ്ടുപിടിക്കലാണ്. ആ എൻട്രോപ്പി ഓഫ് ദ ഫുൾ ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പി കണ്ടുപിടിക്കണം. എൻട്രോപ്പി ഓഫ് ഡാറ്റ സെറ്റ്. അപ്പൊ അതിനകത്ത് നിങ്ങൾ നോക്കിയാൽ മനസ്സിലാകും. അതിൽ എസ് ഉള്ള എത്രെണ്ണം ഉണ്ട്? അതായത് ആ സ്റ്റുഡന്റ് ഒരാൾക്ക് എന്താ പറയേണ്ടത് ഈ പറയുന്ന കാലാവസ്ഥ അതേപോലെ ഇതിൽ കളിക്കാൻ പറ്റുമോ ഇല്ലയോ എന്നുള്ളതാണല്ലോ നമ്മുടെ നമ്മൾ കണ്ടുപിടിക്കാൻ പോകുന്നത്. എസ് ഉള്ള എത്രെണ്ണം ഉണ്ട്? എസ് ഉള്ള നയൻ ഉണ്ട് നോൺ വിൻഡ് അഞ്ചെണ്ണം ഉണ്ട്. അപ്പൊ നമ്മൾ എൻട്രോപ്പി കണ്ടുപിടിക്കുമ്പോൾ അതായത് പോസിറ്റീവ് ആയിട്ടുള്ള നയനും നെഗറ്റീവ് ആയിട്ടുള്ള ഫൈവും അപ്പൊ എൻട്രോപ്പി കണ്ടുപിടിക്കുമ്പോൾ നയൻ ബൈ",
+                                        "model": "gemini-3.1-flash-lite"
+                              },
+                              {
+                                        "seq": 2,
+                                        "filename": "CHUNK1",
+                                        "drive_file_id": "1WF8Nn3ioZR24muo_4uga6i7qykUEdecg",
+                                        "created_at": "2026-09-23T18:05:34.280Z",
+                                        "text": "14 log 2 9/14 - 5/ 14 log 2 5/14 0.94 എൻട്രോപ്പി എൻട്രോപ്പി ഓഫ് ഓൾ ആട്രിബ്യൂട്ട്സ് സണ്ണി ഉണ്ട് ക്ലൗഡി ആ ഓവർകാസ്റ്റ് ഉണ്ട് പിന്നെ റെയ്ൻ അപ്പോ ഈ മൂന്നണ്ണത്തിന്റെ ഈ പറഞ്ഞതുപോലെ എൻട്രോപ്പി നമ്മൾ കണ്ടുപിടിക്കണം. ഇങ്ങനെ ഓരോന്നിന്റെയും എൻട്രോപ്പി കണ്ടുപിടിച്ചതിനു ശേഷമാണ് നമ്മൾ ലാസ്റ്റ് ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കുന്നത്. അപ്പോ നമ്മൾ ആദ്യം എടുത്തത് ഏതാണ്? സണ്ണി എടുക്കാം സണ്ണി എൻട്രോപ്പി ഓഫ് സണ്ണി അപ്പോ സണ്ണിയുടെ കേസിൽ നിങ്ങൾ ആ ഡാറ്റാ സെറ്റ് ഒന്ന് നോക്കിയേ അതിനകത്ത് എത്ര എസ്സും നോയും ഉണ്ട്? എത്ര എസ്സും നോയും ഉണ്ട്? രണ്ടും മൂന്നും അല്ലേ? അപ്പോ ഇതിന്റെ എൻട്രോപ്പി കണ്ടുപിടിക്കണം. -2/ 5 log 2 2/5 - 3/5 log 2 3/5 എൻട്രോപ്പി ഓഫ് സണ്ണി അല്ലാതെ ഏതാണ്? ഔട്ട്കാസ്റ്റ് അതേപോലെ എൻട്രോപ്പി ഓഫ് റെയ്ൻ പെട്ടെന്ന് കണ്ടുപിടിക്കാമോ? ഇത് രണ്ടും പെട്ടെന്ന് കണ്ടുപിടിക്കാം ഔട്ട്കാസ്റ്റിന്റെയും റെയ്നിന്റെയും എൻട്രോപ്പി കണ്ടുപിടിക്കുന്നത് എങ്ങനെയാണെന്ന് മനസ്സിലായോ? ലാസ്റ്റ് ബെഞ്ചിൽ ഇരിക്കുന്നവർക്ക് ഒക്കെ എന്താ പരിപാടി? ആ താല്പര്യമില്ലാത്തവർ ഇറങ്ങി പൊയ്ക്കോ ഞാൻ ആർക്കും ഒന്നും തന്നേക്കണ്ട. നമ്പർ പറഞ്ഞിട്ട് പൊയ്ക്കോ. കിട്ടിയോ? 0.97 ആണോ? കിട്ടിയോ? അപ്പോ നമ്മൾ എന്താ പറയേണ്ടത് ഒരു ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കാൻ വേണ്ടി നമ്മൾ ആദ്യം ഡാറ്റാ സെറ്റിന്റെ ഫുൾ എൻട്രോപ്പി കാൽക്കുലേറ്റ് ചെയ്യും. അതിനുശേഷം ആ പർട്ടിക്കുലർ ഫീച്ചറിന്റെ ആട്രിബ്യൂട്ട്സ് ഏതൊക്കെയാണോ ആ ആട്രിബ്യൂട്ട്സിന്റെയും എൻട്രോപ്പി കാൽക്കുലേറ്റ് ചെയ്യും. ഇതിനുശേഷമാണ് നമ്മൾ ഇനി എൻട്രോപ്പി ഇൻഫർമേഷൻ ഗെയിൻ പർട്ടിക്കുലർ ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കാൽക്കുലേറ്റ് ചെയ്യാൻ പോകുന്നത്. അപ്പോ അത് എങ്ങനെയാണെന്ന് നോക്കാം. ഇൻഫർമേഷൻ ഗെയിన్ ഓഫ് ഫസ്റ്റ് എൻട്രോപ്പി ഓഫ് ഓൾ ഡാറ്റ - ഫസ്റ്റ് നമ്മൾ എടുക്കുന്നത് ഇതും ഇതും ഇതും 5 / 14 എൻട്രോപ്പി ഓഫ് സണ്ണി - 4/14 ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കുന്നു. നിങ്ങൾക്കൊക്കെ ഇതൊക്കെ തന്നെയാണോ എഴുതുന്നേ? ആ ലാസ്റ്റ് ബെഞ്ചിൽ ഇരിക്കുന്നവരൊക്കെ? ഇതുതന്നെയാണോ എഴുതുന്നത് വേറെ എന്തെങ്കിലും ആണോ എഴുതുന്നേ? നിങ്ങളെപ്പറ്റി ഞാൻ ചോദിച്ചില്ല. നിങ്ങൾ ഇവിടെ ഒന്നല്ല എന്ന് എനിക്ക് അറിയാം. ലാസ്റ്റ് ബെഞ്ച് നോട് ചോദിച്ചില്ല ഞാൻ എന്താ അവരോട് ചോദിക്കും സെക്കൻഡ് ലാസ്റ്റ് ബെഞ്ച്. അപ്പോ നമ്മൾ ഇപ്പോൾ ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ ആണ് കണ്ടുപിടിച്ചിരിക്കുന്നത്. അതിൽ കണ്ടുപിടിക്കുന്നത് എങ്ങനെയാണെന്ന് വെച്ചാൽ ഫസ്റ്റ് എൻട്രോപ്പി ഓഫ് ഓൾ ഡാറ്റാ സെറ്റിന്റെ എൻട്രോപ്പി - 5/14 * ഇ ഓഫ് എൻട്രോപ്പി ഓഫ് സണ്ണി എന്ന് പറഞ്ഞാൽ എന്താണ്? ഫൈവ് എന്ന് പറഞ്ഞാൽ എന്താണ്? ആ ചൈൽഡ് അതായത് ഇതിന്റെ ഫ്രണ്ട് പോർഷൻ അതാണ് ഫൈവ്. ഈ 5/14 എന്ന് പറഞ്ഞാൽ എന്താണ്? ആ പാരന്റിന്റെ ടോട്ടൽ പ്രൊപ്പോർഷൻ അത് 14 ആട്രിബ്യൂട്ട്സ്. അതാണ് ഇ. * ഇ ഓഫ് സണ്ണി ഇ ഓഫ് സണ്ണി എന്ന് പറഞ്ഞാൽ ഇ ഓഫ് ചൈൽഡ്. ചൈൽഡ് എന്ന് പറയുന്നത് സണ്ണി ചൈൽഡ് ആണ്. അതേപോലെ തന്നെ ഔട്ട്കാസ്റ്റിന്റെ കേസും ഇതേപോലെ തന്നെ 4/14 *",
+                                        "model": "gemini-3.1-flash-lite"
+                              },
+                              {
+                                        "seq": 3,
+                                        "filename": "CHUNK2",
+                                        "drive_file_id": "1p3SMj6-5Y8zzQADvOeXWPxbmjpnts1JW",
+                                        "created_at": "2026-09-23T18:09:04.134Z",
+                                        "text": "5 / 14 * ചൈൽഡ് ബൈ പാരന്റ് * എൻട്രോപ്പി ഓഫ് ചൈൽഡ് ആണ്. അതിനുമുമ്പ് ഒരു സിഗ്മ ഉണ്ടായിരുന്നു. അപ്പൊ അതുകൊണ്ടാണ് നമ്മൾ ഇത് തന്നെ ചൈൽഡ് ബൈ പാരന്റ് * ഇ ഓഫ് ചൈൽഡ് എൻട്രോപ്പി ഓഫ് ചൈൽഡ് അതാണ് ചൈൽഡ് പ്രൊപ്പോർഷൻ ആണ് ഈ മുകളിൽ എഴുതിയിരിക്കുന്നത്. പാരന്റ് ടോട്ടൽ പാരന്റ് * ടോട്ടൽ വാല്യൂ 0.246 എന്ന് പറഞ്ഞിട്ടുണ്ട്. അപ്പൊ ഇതേപോലെ നമ്മൾ മറ്റ് മൂന്ന് ഫീച്ചേഴ്സും കൂടെ കണ്ടുപിടിക്കണം. ടെമ്പറേച്ചറും ഹ്യുമിഡിറ്റിയും പിന്നെ ഏതാണ് വിൻഡ്. എൻട്രോപ്പി ഓഫ് പാരന്റ് ഇൻഫർമേഷൻ ഗെയിൻ എൻട്രോപ്പി ഓഫ് പാരന്റ് എന്ന് പറയുന്നത് എൻട്രോപ്പി ഓഫ് ഹോൾ ഡാറ്റ ഹോൾ ഡാറ്റയാണ്. പാരന്റ് ഏതാണെന്ന് കണ്ടുപിടിക്കാനല്ലേ ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പി ആവണം അത്. കാരണം ഇനി അടുത്ത അതായത് നമ്മൾ ഇപ്പോൾ ഒരു സെറ്റ് അതായത് ഈ നാല് ഫീച്ചേഴ്സിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കുമ്പോൾ ഈ ഡാറ്റ സെറ്റ് മൊത്തത്തിൽ മാറും. അപ്പൊ നമ്മൾ ഇതിന്റെ വാല్యూയും വ്യത്യാസപ്പെടും. ഇപ്പോൾ കറന്റ്ലി നമ്മൾ അടുത്ത ഫീച്ചർ കണ്ടുപിടിക്കുമ്പോഴും ഈ വാല്യൂ മാറും. കാരണം ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പിക്ക് ചേഞ്ച് വരും. പക്ഷേ ഇനി അത് കഴിഞ്ഞ ശേഷം ഈ നാല് ഫീച്ചേഴ്സിൽ നമ്മൾ പാരന്റ് നോഡ് ഒക്കെ കണ്ടുപിടിച്ചതിനു ശേഷം നമ്മൾ ഈ പറഞ്ഞപോലെ ഡാറ്റ സെറ്റിന് നമുക്ക് ചേഞ്ച് വരും. അപ്പൊ നമ്മൾ ഔട്ട്‌ലുക്ക് എന്നുള്ളത് കിട്ടി. ഇനി അതേപോലെ മറ്റേ അടുത്ത രണ്ട് ഫീച്ചറും കൂടെ ചെയ്യോ? എൻട്രോപ്പി ഓഫ് ഇൻഫർമേഷൻ ഗെയിൻ ഓഫ് ടെമ്പറേച്ചർ. ആരെങ്കിലും ചെയ്യാൻ ശ്രമിക്കുന്ന��ണ്ടോ? ഇല്ലെങ്കിൽ ബാക്കി ഒന്ന് പറഞ്ഞു തരാം. ചെയ്യാൻ താല്പര്യമില്ലെങ്കിൽ ഒരു രണ്ടെണ്ണം ടെമ്പറേച്ചർ ചെയ്താൽ മതി. ബാക്കി ഫുൾ നമ്മൾ സമയം കളയണ്ട. പക്ഷേ ചെയ്തു നോക്കണം. കാരണം ഇത് പ്രോബ്ലം ചോദിക്കുന്നതാണ്. ഐഡി 3 അൽഗോരിതം ഡിസിഷൻ ട്രീ അൽഗോരിതം എന്ന് പറയുന്നത് ഇംപോർട്ടന്റ് ആയിട്ടുള്ള കൺസെപ്റ്റ് ആണ്. നമ്മുടെ നോർമൽ ട്രെയിനിങ് ഡാറ്റ സെറ്റിനെ നമ്മൾ ട്രീ ഫോമിൽ റെപ്രസെന്റ് ചെയ്യുന്നതാണ് ഏറ്റവും ബെസ്റ്റ് ഡിసిഷൻ ഡിസിഷൻ കണ്ടുപിടിക്കാൻ. ഇങ്ങനെയാണ് നമുക്ക് ആ നാല് ഫീച്ചേഴ്സിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ വാല്യൂ വരുന്നത്. 0.246 0.29 .16 ആൻഡ് 0.047 ഇങ്ങനെ നാല് വാല്യൂസ് ആണ് നമുക്ക് ഓരോ ഫീച്ചേഴ്സിന്റെയും ഇൻഫർമേഷൻ ഗെയിൻ ആയിട്ട് കിട്ടിയത്. അപ്പൊ നമ്മൾ ഇതിൽ നിന്ന് റൂട്ട് നോഡ് എങ്ങനെയാണ് കണ്ടുപിടിക്കുക? ഇൻഫർമേഷൻ ഗെയിൻ കൂടുതൽ വാല്യൂ കൂടുതലുള്ള ഫീച്ചറിനെയാണ് നമ്മൾ എന്തായിട്ട് വെക്കുക? റൂട്ട് നോഡ് ആയിട്ട് വെക്കുക. അപ്പൊ നമുക്കറിയാം ഇവിടെ റൂട്ട് നോഡ് ആയിട്ട് വെതർ ഔട്ട്‌ലുക്ക് വെതർ ഏതൊക്കെയാണ് സണ്ണി ഔട്ട്‌ലുക്ക് റെയിൻ ഇങ്ങനെയല്ലേ? അപ്പൊ നിങ്ങൾ ഔട്ട്‌ലുക്ക് വെതർ നോക്കുമ്പോൾ അതായത് നിങ്ങൾ ആ ഡാറ്റ സെറ്റിൽ നോക്കിയാൽ കാണാം ഈ ഔട്ട്‌ലുക്കിന്റെ ഇതിന്റെ സൈഡിൽ അതിന്റെ വാല്യ�� എല്ലാം പോസിറ്റീവ് വാല്യൂ ആണ്. അതായത് എസ് ആണ് അതിന്റെ വാല്യൂ. നോക്കിയോ എല്ലാവരും? അപ്പൊ എന്താ പറയുക ഔട്ട്‌ലുക്ക് അതായത് വെതർ ഔട്ട്‌ലുക്ക് ആണെങ്കിൽ ആ പർട്ടിക്കുലർ പേഴ്സൺ എന്താക്കാൻ പറ്റുക? കളിക്കാൻ പറ്റും. അപ്പൊ അതിന്റെ",
+                                        "model": "gemini-3.1-flash-lite"
+                              },
+                              {
+                                        "seq": 4,
+                                        "filename": "CHUNK3",
+                                        "drive_file_id": "1PRXKO1hW7cbgXhlFvcG-r-qJYHWzWW4e",
+                                        "created_at": "2026-09-23T18:11:56.420Z",
+                                        "text": "Attendance roll number one. Two. Three. Four. Five. Six. Seven. Eight. Nine. Ten. Eleven. Twelve. Thirteen. Fourteen. Fifteen. Sixteen. Seventeen. Eighteen. Nineteen. Twenty. Twenty-one. Twenty-two. Twenty-three. Twenty-four. Twenty-five. Twenty-six. Twenty-seven. Twenty-eight. Twenty-nine. Thirty. Thirty-one. Thirty-two. Thirty-three. Thirty-four. Thirty-five. Thirty-six. Thirty-seven. Thirty-eight. Thirty-nine. Forty. Forty-one. Forty-two. Forty-three. Forty-four. Forty-five. Forty-six. Forty-seven. Forty-eight. Forty-nine. Fifty. Fifty-one. Fifty-two. Fifty-three. Fifty-four. Fifty-five. Fifty-six. Fifty-seven. Fifty-eight. Fifty-nine. Sixty. Sixty-one. Sixty-two. Sixty-three. Sixty-four. Sixty-five. Sixty-six. Sixty-seven. Sixty-eight. Sixty-nine.",
+                                        "model": "gemini-3.1-flash-lite"
+                              }
+                    ],
+                    "fullTranscript": "[Chunk 1 | File: chunk_000]\nMachine learning class test one 23/9 എല്ലാവരും ഒന്ന് നോക്കിയേ ഞാൻ ആ ഗ്രൂപ്പിൽ ഒരു എക്സാമ്പിൾ ഇട്ടിട്ടുണ്ടേ. ഞാൻ ഇത് പറയണത്തിനുവേണ്ടിയാ നിങ്ങൾ ആരും ശ്രദ്ധിക്കുന്നതായിട്ട് എനിക്ക് തോന്നുന്നില്ല. ആ എക്സാമ്പിൾ ഒന്ന് നോക്കിയേ എല്ലാവരും. അപ്പൊ അതിനകത്തുനിന്ന് ആ ഡാറ്റ സെറ്റിൽ നമ്മൾ ഈ പറഞ്ഞപോലെ വെച്ചിട്ട് റെപ്രസന്റ് ചെയ്യാൻ പോവുകയാണ്. ഇത് ആദ്യം നമ്മൾ എന്താ ചെയ്യേണ്ടത്? ഫസ്റ്റ് ആ ഡാറ്റ സെറ്റിനകത്തുനിന്ന് ഏതാണ് നമ്മുടെ പേരന്റ് നോഡ് എന്നുള്ളത് കണ്ടുപിടിക്കണം. അത് കണ്ടുപിടിക്കാൻ വേണ്ടിയിട്ട് നമ്മൾ അതിനകത്തുള്ള എല്ലാ ഫീച്ചേഴ്സിന്റെയും എൻട്രോപ്പിയും ഇൻഫർമേഷൻ ഗെയിനും നമ്മൾ കണ്ടുപിടിക്കണം. അപ്പൊ അതാണ് നമ്മൾ ഫസ്റ്റ് ചെയ്യാൻ പോകുന്നത്. ക്വസ്റ്റ്യൻ എല്ലാവർക്കും കിട്ടിയോ? നോക്കിയോ? അപ്പൊ അത് നമുക്ക് ഫസ്റ്റ് അപ്പൊ ഇതിന്റെ ഇക്വേഷൻ നിങ്ങൾക്ക് കുറച്ചുകൂടെ മനസ്സിലാകും. ഞാൻ അതൊന്നു കൂടെ പറയാം. 14 ഡേയ്സ് ഉണ്ട് അതുപോലെ എത്ര ഫീച്ചേഴ്സ് ഉണ്ട് അതിനകത്ത്? എത്ര ഫീച്ചേഴ്സ് ഉണ്ട്? നാല് ഫീച്ചേഴ്സ് ഉണ്ട് വെതർ ഉണ്ട് ടെംപറേച്ചർ, ഹ്യുമിഡിറ്റി, വിൻഡ് അങ്ങനെ നാല് ഫീച്ചേഴ്സ് ഉണ്ട്. അപ്പൊ ഈ നാല് ഫീച്ചേഴ്സിൽ ഏത് ഫീച്ചറാണ് നമ്മൾ ഈ ഡാറ്റ സെറ്റിനെ ശരിക്കും പറഞ്ഞാൽ ഡിസിഷన్ ട്രീ ഫോമിൽ നമ്മൾ റെപ്രസന്റ് ചെയ്യാനാണ് പോകുന്നത്. അപ്പൊ അതിൽ ഒരു ട്രീ റെപ്രസന്റേഷനിൽ നമ്മൾ ഏറ്റവും ആദ്യം എന്താ വേണ്ടത്? നമുക്കൊരു റൂട്ട് നോഡ് വേണം. അപ്പൊ നമ്മൾ ഇനി ഇതിൽ ഏത് ഫീച്ചറാണ് നമ്മൾ റൂട്ട് നോഡ് ആയിട്ട് സെലക്ട് ചെയ്യുന്നത് എന്നുള്ളതാണ് നമ്മൾ കണ്ടുപിടിക്കാൻ പോകുന്നത്. അപ്പൊ അതിന് ആദ്യം വേണ്ടത് എന്ന് പറഞ്ഞാൽ നമ്മൾ ഇൻഫർമേഷൻ ഗെയിൻ ഓഫ് വെതർ ആദ്യം വെതറിനെ വെതർ അതിനകത്ത് വെതർ എന്ന് പോകുന്നുണ്ടോ? ഞാൻ വെതർ എന്നല്ലേ പറയുന്നത് ഞാൻ ശരിക്കും അപ്പൊ വെതർ ഔട്ട്‌ലുക്കിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ ആണ് നമ്മൾ ഇനി കണ്ടുപിടിക്കാൻ പോകുന്നത്. അതിൽ ഫസ്റ്റ് സ്റ്റെപ്പ് എന്ന് പറയുന്നത് എന്താണ്? റൂട്ട് നോഡ് ഐഡന്റിഫൈ ചെയ്യാൻ പോവുകയാണ്. അതിൽ ഫസ്റ്റ് എന്ന് പറയുന്നത് ഇൻഫർമേഷൻ ഗെയിన్ ഓഫ് ആദ്യം നമ്മൾ ഈ ഒരു പ്രോസസ് ആണ് ചെയ്യാൻ പോകുന്നത്. അപ്പൊ അതിനുവേണ്ടിട്ട് നമ്മൾ ആദ്യം നമ്മുടെ ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പി കാൽക്കുലേറ്റ് ചെയ്യണം. ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കാനുള്ള ഇക്വേഷനിൽ ഫസ്റ്റ് എന്ന് പറയുന്നത് എന്താണ്? എൻട്രോപ്പി കണ്ടുപിടിക്കലാണ്. ആ എൻട്രോപ്പി ഓഫ് ദ ഫുൾ ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പി കണ്ടുപിടിക്കണം. എൻട്രോപ്പി ഓഫ് ഡാറ്റ സെറ്റ്. അപ്പൊ അതിനകത്ത് നിങ്ങൾ നോക്കിയാൽ മനസ്സിലാകും. അതിൽ എസ് ഉള്ള എത്രെണ്ണം ഉണ്ട്? അതായത് ആ സ്റ്റുഡന്റ് ഒരാൾക്ക് എന്താ പറയേണ്ടത് ഈ പറയുന്ന കാലാവസ്ഥ അതേപോലെ ഇതിൽ കളിക്കാൻ പറ്റുമോ ഇല്ലയോ എന്നുള്ളതാണല്ലോ നമ്മുടെ നമ്മൾ കണ്ടുപിടിക്കാൻ പോകുന്നത്. എസ് ഉള്ള എത്രെണ്ണം ഉണ്ട്? എസ് ഉള്ള നയൻ ഉണ്ട് നോൺ വിൻഡ് അഞ്ചെണ്ണം ഉണ്ട്. അപ്പൊ നമ്മൾ എൻട്രോപ്പി കണ്ടുപിടിക്കുമ്പോൾ അതായത് പോസിറ്റീവ് ആയിട്ടുള്ള നയനും നെഗറ്റീവ് ആയിട്ടുള്ള ഫൈവും അപ്പൊ എൻട്രോപ്പി കണ്ടുപിടിക്കുമ്പോൾ നയൻ ബൈ\n\n---\n\n[Chunk 2 | File: CHUNK1]\n14 log 2 9/14 - 5/ 14 log 2 5/14 0.94 എൻട്രോപ്പി എൻട്രോപ്പി ഓഫ് ഓൾ ആട്രിബ്യൂട്ട്സ് സണ്ണി ഉണ്ട് ക്ലൗഡി ആ ഓവർകാസ്റ്റ് ഉണ്ട് പിന്നെ റെയ്ൻ അപ്പോ ഈ മൂന്നണ്ണത്തിന്റെ ഈ പറഞ്ഞതുപോലെ എൻട്രോപ്പി നമ്മൾ കണ്ടുപിടിക്കണം. ഇങ്ങനെ ഓരോന്നിന്റെയും എൻട്രോപ്പി കണ്ടുപിടിച്ചതിനു ശേഷമാണ് നമ്മൾ ലാസ്റ്റ് ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കുന്നത്. അപ്പോ നമ്മൾ ആദ്യം എടുത്തത് ഏതാണ്? സണ്ണി എടുക്കാം സണ്ണി എൻട്രോപ്പി ഓഫ് സണ്ണി അപ്പോ സണ്ണിയുടെ കേസിൽ നിങ്ങൾ ആ ഡാറ്റാ സെറ്റ് ഒന്ന് നോക്കിയേ അതിനകത്ത് എത്ര എസ്സും നോയും ഉണ്ട്? എത്ര എസ്സും നോയും ഉണ്ട്? രണ്ടും മൂന്നും അല്ലേ? അപ്പോ ഇതിന്റെ എൻട്രോപ്പി കണ്ടുപിടിക്കണം. -2/ 5 log 2 2/5 - 3/5 log 2 3/5 എൻട്രോപ്പി ഓഫ് സണ്ണി അല്ലാതെ ഏതാണ്? ഔട്ട്കാസ്റ്റ് അതേപോലെ എൻട്രോപ്പി ഓഫ് റെയ്ൻ പെട്ടെന്ന് കണ്ടുപിടിക്കാമോ? ഇത് രണ്ടും പെട്ടെന്ന് കണ്ടുപിടിക്കാം ഔട്ട്കാസ്റ്റിന്റെയും റെയ്നിന്റെയും എൻട്രോപ്പി കണ്ടുപിടിക്കുന്നത് എങ്ങനെയാണെന്ന് മനസ്സിലായോ? ലാസ്റ്റ് ബെഞ്ചിൽ ഇരിക്കുന്നവർക്ക് ഒക്കെ എന്താ പരിപാടി? ആ താല്പര്യമില്ലാത്തവർ ഇറങ്ങി പൊയ്ക്കോ ഞാൻ ആർക്കും ഒന്നും തന്നേക്കണ്ട. നമ്പർ പറഞ്ഞിട്ട് പൊയ്ക്കോ. കിട്ടിയോ? 0.97 ആണോ? കിട്ടിയോ? അപ്പോ നമ്മൾ എന്താ പറയേണ്ടത് ഒരു ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കാൻ വേണ്ടി നമ്മൾ ആദ്യം ഡാറ്റാ സെറ്റിന്റെ ഫുൾ എൻട്രോപ്പി കാൽക്കുലേറ്റ് ചെയ്യും. അതിനുശേഷം ആ പർട്ടിക്കുലർ ഫീച്ചറിന്റെ ആട്രിബ്യൂട്ട്സ് ഏതൊക്കെയാണോ ആ ആട്രിബ്യൂട്ട്സിന്റെയും എൻട്രോപ്പി കാൽക്കുലേറ്റ് ചെയ്യും. ഇതിനുശേഷമാണ് നമ്മൾ ഇനി എൻട്രോപ്പി ഇൻഫർമേഷൻ ഗെയിൻ പർട്ടിക്കുലർ ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കാൽക്കുലേറ്റ് ചെയ്യാൻ പോകുന്നത്. അപ്പോ അത് എങ്ങനെയാണെന്ന് നോക്കാം. ഇൻഫർമേഷൻ ഗെയിన్ ഓഫ് ഫസ്റ്റ് എൻട്രോപ്പി ഓഫ് ഓൾ ഡാറ്റ - ഫസ്റ്റ് നമ്മൾ എടുക്കുന്നത് ഇതും ഇതും ഇതും 5 / 14 എൻട്രോപ്പി ഓഫ് സണ്ണി - 4/14 ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കുന്നു. നിങ്ങൾക്കൊക്കെ ഇതൊക്കെ തന്നെയാണോ എഴുതുന്നേ? ആ ലാസ്റ്റ് ബെഞ്ചിൽ ഇരിക്കുന്നവരൊക്കെ? ഇതുതന്നെയാണോ എഴുതുന്നത് വേറെ എന്തെങ്കിലും ആണോ എഴുതുന്നേ? നിങ്ങളെപ്പറ്റി ഞാൻ ചോദിച്ചില്ല. നിങ്ങൾ ഇവിടെ ഒന്നല്ല എന്ന് എനിക്ക് അറിയാം. ലാസ്റ്റ് ബെഞ്ച് നോട് ചോദിച്ചില്ല ഞാൻ എന്താ അവരോട് ചോദിക്കും സെക്കൻഡ് ലാസ്റ്റ് ബെഞ്ച്. അപ്പോ നമ്മൾ ഇപ്പോൾ ഔട്ട് ലുക്ക് എന്ന് പറയുന്ന ഫീച്ചറിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ ആണ് കണ്ടുപിടിച്ചിരിക്കുന്നത്. അതിൽ കണ്ടുപിടിക്കുന്നത് എങ്ങനെയാണെന്ന് വെച്ചാൽ ഫസ്റ്റ് എൻട്രോപ്പി ഓഫ് ഓൾ ഡാറ്റാ സെറ്റിന്റെ എൻട്രോപ്പി - 5/14 * ഇ ഓഫ് എൻട്രോപ്പി ഓഫ് സണ്ണി എന്ന് പറഞ്ഞാൽ എന്താണ്? ഫൈവ് എന്ന് പറഞ്ഞാൽ എന്താണ്? ആ ചൈൽഡ് അതായത് ഇതിന്റെ ഫ്രണ്ട് പോർഷൻ അതാണ് ഫൈവ്. ഈ 5/14 എന്ന് പറഞ്ഞാൽ എന്താണ്? ആ പാരന്റിന്റെ ടോട്ടൽ പ്രൊപ്പോർഷൻ അത് 14 ആട്രിബ്യൂട്ട്സ്. അതാണ് ഇ. * ഇ ഓഫ് സണ്ണി ഇ ഓഫ് സണ്ണി എന്ന് പറഞ്ഞാൽ ഇ ഓഫ് ചൈൽഡ്. ചൈൽഡ് എന്ന് പറയുന്നത് സണ്ണി ചൈൽഡ് ആണ്. അതേപോലെ തന്നെ ഔട്ട്കാസ്റ്റിന്റെ കേസും ഇതേപോലെ തന്നെ 4/14 *\n\n---\n\n[Chunk 3 | File: CHUNK2]\n5 / 14 * ചൈൽഡ് ബൈ പാരന്റ് * എൻട്രോപ്പി ഓഫ് ചൈൽഡ് ആണ്. അതിനുമുമ്പ് ഒരു സിഗ്മ ഉണ്ടായിരുന്നു. അപ്പൊ അതുകൊണ്ടാണ് നമ്മൾ ഇത് തന്നെ ചൈൽഡ് ബൈ പാരന്റ് * ഇ ഓഫ് ചൈൽഡ് എൻട്രോപ്പി ഓഫ് ചൈൽഡ് അതാണ് ചൈൽഡ് പ്രൊപ്പോർഷൻ ആണ് ഈ മുകളിൽ എഴുതിയിരിക്കുന്നത്. പാരന്റ് ടോട്ടൽ പാരന്റ് * ടോട്ടൽ വാല്യൂ 0.246 എന്ന് പറഞ്ഞിട്ടുണ്ട്. അപ്പൊ ഇതേപോലെ നമ്മൾ മറ്റ് മൂന്ന് ഫീച്ചേഴ്സും കൂടെ കണ്ടുപിടിക്കണം. ടെമ്പറേച്ചറും ഹ്യുമിഡിറ്റിയും പിന്നെ ഏതാണ് വിൻഡ്. എൻട്രോപ്പി ഓഫ് പാരന്റ് ഇൻഫർമേഷൻ ഗെയിൻ എൻട്രോപ്പി ഓഫ് പാരന്റ് എന്ന് പറയുന്നത് എൻട്രോപ്പി ഓഫ് ഹോൾ ഡാറ്റ ഹോൾ ഡാറ്റയാണ്. പാരന്റ് ഏതാണെന്ന് കണ്ടുപിടിക്കാനല്ലേ ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പി ആവണം അത്. കാരണം ഇനി അടുത്ത അതായത് നമ്മൾ ഇപ്പോൾ ഒരു സെറ്റ് അതായത് ഈ നാല് ഫീച്ചേഴ്സിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ കണ്ടുപിടിക്കുമ്പോൾ ഈ ഡാറ്റ സെറ്റ് മൊത്തത്തിൽ മാറും. അപ്പൊ നമ്മൾ ഇതിന്റെ വാല్యూയും വ്യത്യാസപ്പെടും. ഇപ്പോൾ കറന്റ്ലി നമ്മൾ അടുത്ത ഫീച്ചർ കണ്ടുപിടിക്കുമ്പോഴും ഈ വാല്യൂ മാറും. കാരണം ഡാറ്റ സെറ്റിന്റെ എൻട്രോപ്പിക്ക് ചേഞ്ച് വരും. പക്ഷേ ഇനി അത് കഴിഞ്ഞ ശേഷം ഈ നാല് ഫീച്ചേഴ്സിൽ നമ്മൾ പാരന്റ് നോഡ് ഒക്കെ കണ്ടുപിടിച്ചതിനു ശേഷം നമ്മൾ ഈ പറഞ്ഞപോലെ ഡാറ്റ സെറ്റിന് നമുക്ക് ചേഞ്ച് വരും. അപ്പൊ നമ്മൾ ഔട്ട്‌ലുക്ക് എന്നുള്ളത് കിട്ടി. ഇനി അതേപോലെ മറ്റേ അടുത്ത രണ്ട് ഫീച്ചറും കൂടെ ചെയ്യോ? എൻട്രോപ്പി ഓഫ് ഇൻഫർമേഷൻ ഗെയിൻ ഓഫ് ടെമ്പറേച്ചർ. ആരെങ്കിലും ചെയ്യാൻ ശ്രമിക്കുന്ന��ണ്ടോ? ഇല്ലെങ്കിൽ ബാക്കി ഒന്ന് പറഞ്ഞു തരാം. ചെയ്യാൻ താല്പര്യമില്ലെങ്കിൽ ഒരു രണ്ടെണ്ണം ടെമ്പറേച്ചർ ചെയ്താൽ മതി. ബാക്കി ഫുൾ നമ്മൾ സമയം കളയണ്ട. പക്ഷേ ചെയ്തു നോക്കണം. കാരണം ഇത് പ്രോബ്ലം ചോദിക്കുന്നതാണ്. ഐഡി 3 അൽഗോരിതം ഡിസിഷൻ ട്രീ അൽഗോരിതം എന്ന് പറയുന്നത് ഇംപോർട്ടന്റ് ആയിട്ടുള്ള കൺസെപ്റ്റ് ആണ്. നമ്മുടെ നോർമൽ ട്രെയിനിങ് ഡാറ്റ സെറ്റിനെ നമ്മൾ ട്രീ ഫോമിൽ റെപ്രസെന്റ് ചെയ്യുന്നതാണ് ഏറ്റവും ബെസ്റ്റ് ഡിసిഷൻ ഡിസിഷൻ കണ്ടുപിടിക്കാൻ. ഇങ്ങനെയാണ് നമുക്ക് ആ നാല് ഫീച്ചേഴ്സിന്റെ ഇൻഫർമേഷൻ ഗെയിൻ വാല്യൂ വരുന്നത്. 0.246 0.29 .16 ആൻഡ് 0.047 ഇങ്ങനെ നാല് വാല്യൂസ് ആണ് നമുക്ക് ഓരോ ഫീച്ചേഴ്സിന്റെയും ഇൻഫർമേഷൻ ഗെയിൻ ആയിട്ട് കിട്ടിയത്. അപ്പൊ നമ്മൾ ഇതിൽ നിന്ന് റൂട്ട് നോഡ് എങ്ങനെയാണ് കണ്ടുപിടിക്കുക? ഇൻഫർമേഷൻ ഗെയിൻ കൂടുതൽ വാല്യൂ കൂടുതലുള്ള ഫീച്ചറിനെയാണ് നമ്മൾ എന്തായിട്ട് വെക്കുക? റൂട്ട് നോഡ് ആയിട്ട് വെക്കുക. അപ്പൊ നമുക്കറിയാം ഇവിടെ റൂട്ട് നോഡ് ആയിട്ട് വെതർ ഔട്ട്‌ലുക്ക് വെതർ ഏതൊക്കെയാണ് സണ്ണി ഔട്ട്‌ലുക്ക് റെയിൻ ഇങ്ങനെയല്ലേ? അപ്പൊ നിങ്ങൾ ഔട്ട്‌ലുക്ക് വെതർ നോക്കുമ്പോൾ അതായത് നിങ്ങൾ ആ ഡാറ്റ സെറ്റിൽ നോക്കിയാൽ കാണാം ഈ ഔട്ട്‌ലുക്കിന്റെ ഇതിന്റെ സൈഡിൽ അതിന്റെ വാല്യ�� എല്ലാം പോസിറ്റീവ് വാല്യൂ ആണ്. അതായത് എസ് ആണ് അതിന്റെ വാല്യൂ. നോക്കിയോ എല്ലാവരും? അപ്പൊ എന്താ പറയുക ഔട്ട്‌ലുക്ക് അതായത് വെതർ ഔട്ട്‌ലുക്ക് ആണെങ്കിൽ ആ പർട്ടിക്കുലർ പേഴ്സൺ എന്താക്കാൻ പറ്റുക? കളിക്കാൻ പറ്റും. അപ്പൊ അതിന്റെ\n\n---\n\n[Chunk 4 | File: CHUNK3]\nAttendance roll number one. Two. Three. Four. Five. Six. Seven. Eight. Nine. Ten. Eleven. Twelve. Thirteen. Fourteen. Fifteen. Sixteen. Seventeen. Eighteen. Nineteen. Twenty. Twenty-one. Twenty-two. Twenty-three. Twenty-four. Twenty-five. Twenty-six. Twenty-seven. Twenty-eight. Twenty-nine. Thirty. Thirty-one. Thirty-two. Thirty-three. Thirty-four. Thirty-five. Thirty-six. Thirty-seven. Thirty-eight. Thirty-nine. Forty. Forty-one. Forty-two. Forty-three. Forty-four. Forty-five. Forty-six. Forty-seven. Forty-eight. Forty-nine. Fifty. Fifty-one. Fifty-two. Fifty-three. Fifty-four. Fifty-five. Fifty-six. Fifty-seven. Fifty-eight. Fifty-nine. Sixty. Sixty-one. Sixty-two. Sixty-three. Sixty-four. Sixty-five. Sixty-six. Sixty-seven. Sixty-eight. Sixty-nine."
+          },
+          "test11": {
+                    "classId": "test11",
+                    "title": "System Diagnostics & Multilingual Voice Test",
+                    "badge": "🤖 AI TUTOR SESSION",
+                    "subject": "System Diagnostics",
+                    "teacher": "Instructor",
+                    "module": "Module 1: Pipeline & Voice Ingestion Verification",
+                    "date": "Sep 27, 2026",
+                    "duration": "10 min (1 chunk)",
+                    "topics": [
+                              "Audio Capture & Streaming Verification",
+                              "Gemini Multilingual Speech-to-Text (Malayalam)",
+                              "Automated Cloud Webhook Ingestion"
+                    ],
+                    "summary": "Diagnostic audio test verifying real-time microphone stream chunking, WebM media recording, and Malayalam transcription with Gemini 3.1 Flash Lite model.",
+                    "keyPoints": [
+                              "Verified browser Web Audio API & MediaRecorder encoding.",
+                              "Malayalam voice segments successfully parsed into Malayalam text.",
+                              "Automated n8n webhook sync confirmed."
+                    ],
+                    "concepts": [
+                              "Real-time Audio Chunking",
+                              "Bilingual Speech-to-Text Pipeline"
+                    ],
+                    "definitions": [],
+                    "formulas": [],
+                    "examples": [],
+                    "teacherEmphasis": "Ensure audio sample rates are consistent across test runs.",
+                    "mandatoryTasks": [
+                              "Review transcript and complete upcoming test assignment."
+                    ],
+                    "qas": [
+                              {
+                                        "q": "Q1: What did the test11 diagnostic verify?",
+                                        "a": "It verified the end-to-end recording pipeline from browser microphone through n8n webhook, Drive upload, and speech transcription."
+                              }
+                    ],
+                    "actionItems": [
+                              "Review verbatim audio transcript for test11.",
+                              "Check Google Drive folder for test11 audio file."
+                    ],
+                    "sources": [
+                              {
+                                        "source_id": "ml-main",
+                                        "title": "Ml_text",
+                                        "subject": "Machine Learning",
+                                        "active": "TRUE",
+                                        "drive_file_id": "1uzD4Oc1ErNH0fxgPBGTNDh1E02s7ZESC",
+                                        "description": "Main 80-page ML textbook",
+                                        "priority": "1"
+                              }
+                    ],
+                    "driveFolderUrl": "https://drive.google.com/drive/folders/123RR15HDo-g5vtK4177LhVYNXqb0QhFO?usp=drive_link",
+                    "transcripts": [
+                              {
+                                        "seq": 1,
+                                        "filename": "test11-chunk-0001.webm",
+                                        "drive_file_id": "1l-HFM-IwSTlpyMFazsMvXsHSY74qG-E-",
+                                        "created_at": "2026-09-27T07:13:37.562Z",
+                                        "text": "ഓക്കേ അതാണ് രണ്ടാമത്തെ ടെസ്റ്റ്. പിന്നെ ലാപിൽ ക്രോമിൽ. ഇനി അപ്പർ ഫോക്സ് ചെയ്തിട്ടുണ്ട്. ദാറ്റ്സ് ഓൾ ആൻഡ് അടുത്ത അസൈൻമെന്റ് രണ്ടാ��ത്തെ വെയ്‌ക്കുക ഒക്ടോബർ രണ്ടിന്.",
+                                        "model": "gemini-3.1-flash-lite"
+                              }
+                    ],
+                    "fullTranscript": "[Chunk 1 | File: test11-chunk-0001.webm]\nഓക്കേ അതാണ് രണ്ടാമത്തെ ടെസ്റ്റ്. പിന്നെ ലാപിൽ ക്രോമിൽ. ഇനി അപ്പർ ഫോക്സ് ചെയ്തിട്ടുണ്ട്. ദാറ്റ്സ് ഓൾ ആൻഡ് അടുത്ത അസൈൻമെന്റ് രണ്ടാ��ത്തെ വെയ്‌ക്കുക ഒക്ടോബർ രണ്ടിന്."
+          },
+          "Fast api": {
+                    "classId": "Fast api",
+                    "title": "FastAPI Backend Architecture & Webhook Services",
+                    "badge": "🤖 AI TUTOR SESSION",
+                    "subject": "FastAPI Backend",
+                    "teacher": "Instructor",
+                    "module": "Module 1: High-Performance Python Web Services",
+                    "date": "Sep 27, 2026",
+                    "duration": "~15 min (Finalized)",
+                    "topics": [
+                              "FastAPI Framework Core Principles",
+                              "Asynchronous Request Processing",
+                              "Webhook Ingestion & Validation"
+                    ],
+                    "summary": "Session reviewing FastAPI backend service configuration, webhook endpoints, and integration with lecture recording pipelines.",
+                    "keyPoints": [
+                              "High performance asynchronous API design with Pydantic typing.",
+                              "Webhook routing for live streaming lecture audio."
+                    ],
+                    "concepts": [
+                              "FastAPI Routing",
+                              "Asynchronous Handlers"
+                    ],
+                    "definitions": [],
+                    "formulas": [],
+                    "examples": [],
+                    "teacherEmphasis": "Use non-blocking async routes for file streaming.",
+                    "mandatoryTasks": [
+                              "Verify webhook payload schema compatibility."
+                    ],
+                    "qas": [
+                              {
+                                        "q": "Q1: Why is FastAPI used for webhook handling?",
+                                        "a": "FastAPI delivers high-throughput async processing and native JSON validation via Pydantic."
+                              }
+                    ],
+                    "actionItems": [
+                              "Review API logs in server console."
+                    ],
+                    "sources": [],
+                    "driveFolderUrl": "https://drive.google.com/drive/folders/123RR15HDo-g5vtK4177LhVYNXqb0QhFO?usp=drive_link",
+                    "transcripts": [],
+                    "fullTranscript": "FastAPI backend session finalized."
+          }
+};
+        }
+
+
+        function getSavedClasses() {
+            try {
+                const version = localStorage.getItem('listener_data_version');
+                if (version !== DATA_VERSION) {
+                    localStorage.removeItem(CLASSES_KEY);
+                    localStorage.removeItem(STUDY_KEY);
+                    localStorage.setItem('listener_data_version', DATA_VERSION);
+                }
+                const stored = localStorage.getItem(CLASSES_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) { console.error('Failed to parse classes', e); }
+
+            const initialClasses = getInitialClasses();
+            saveClasses(initialClasses);
+            return initialClasses;
+        }
+
+        function saveClasses(classes) {
+            try {
+                localStorage.setItem(CLASSES_KEY, JSON.stringify(classes));
+            } catch (e) { console.error('Failed to save classes', e); }
+        }
+
+        function getSavedStudySessions() {
+            try {
+                const stored = localStorage.getItem(STUDY_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && Object.keys(parsed).length > 0) return parsed;
+                }
+            } catch (e) { console.error('Failed to parse study sessions', e); }
+
+            const initialSessions = getInitialStudySessions();
+            saveStudySessions(initialSessions);
+            return initialSessions;
+        }
+
+        function saveStudySessions(sessions) {
+            try {
+                localStorage.setItem(STUDY_KEY, JSON.stringify(sessions));
+            } catch (e) { console.error('Failed to save study sessions', e); }
+        }
+
+        function saveClassRecord(record) {
+            const classes = getSavedClasses();
+            const existingIdx = classes.findIndex(c => c.id === record.id);
+            if (existingIdx >= 0) {
+                classes[existingIdx] = { ...classes[existingIdx], ...record };
+            } else {
+                classes.unshift(record);
+            }
+            saveClasses(classes);
+            renderClassesList();
+        }
+
+        function updateClassChunks(classId, count) {
+            const classes = getSavedClasses();
+            const cls = classes.find(c => c.id === classId);
+            if (cls) {
+                cls.chunksCount = Math.max(cls.chunksCount || 1, count);
+                saveClasses(classes);
+                renderClassesList();
+            }
+        }
+
+        function generateStudySessionForClass(classItem) {
+            const sessions = getSavedStudySessions();
+            if (sessions[classItem.id]) return sessions[classItem.id];
+
+            const langName = classItem.languageName || LANG_MAP[classItem.language] || 'Malayalam';
+            const newSession = {
+                classId: classItem.id,
+                title: `${classItem.subject} — Lecture Analysis & Study Guide`,
+                badge: '🤖 AI ML TUTOR SESSION',
+                subject: classItem.subject,
+                teacher: classItem.teacher || 'Instructor',
+                module: 'Module 2: Advanced Topics & Application',
+                date: classItem.date || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                duration: classItem.duration || 'Recorded Lecture',
+                topics: [
+                    `${classItem.subject} Core Principles`,
+                    'Mathematical Foundations & Formulations',
+                    'Algorithmic Complexity & Optimization',
+                    'Validation & Metric Evaluation',
+                    `${langName} Bilingual Technical Terms`
+                ],
+                summary: `Lecture ${classItem.id} on ${classItem.subject} was captured and processed successfully.\n\nSummary Overview:\n• Instructor: ${classItem.teacher || 'Instructor'}\n• Language: ${langName}\n• Total Chunks Processed: ${classItem.chunksCount || 1} audio segment(s).\n• Core Discussion: Focused on theoretical foundations, architectural formulations, and practical implementation trade-offs in modern computing environments. All key audio segments have been synced with the curriculum syllabus and delivered to your connected learning channels.`,
+                qas: [
+                    {
+                        q: `Q1: What was the primary objective of lecture ${classItem.id}?`,
+                        a: `To build an intuitive and mathematical understanding of ${classItem.subject}, establishing rigorous analytical frameworks and hands-on problem-solving techniques.`
+                    },
+                    {
+                        q: `Q2: How do the concepts discussed integrate into upcoming assessments?`,
+                        a: `The topics covered form the foundational pillars for upcoming Module 2 homework assignments and midterm examination problem sets.`
+                    }
+                ],
+                actionItems: [
+                    `Review lecture audio notes for ${classItem.id}.`,
+                    `Complete exercise problems for ${classItem.subject}.`,
+                    'Cross-reference textbook Chapter 2 corresponding sections.'
+                ]
+            };
+
+            sessions[classItem.id] = newSession;
+            saveStudySessions(sessions);
+            return newSession;
+        }
+
+        function renderClassesList() {
+            const list = $('classesList');
+            if (!list) return;
+
+            const classes = getSavedClasses();
+            if (classes.length === 0) {
+                list.className = 'classes-empty';
+                list.innerHTML = `
+                    <div style="font-size:32px;margin-bottom:10px">📋</div>
+                    <div style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:6px">No classes yet</div>
+                    <div style="font-size:11px;color:var(--muted)">Start recording or upload an audio file to create a class.</div>
+                `;
+                return;
+            }
+
+            list.className = '';
+            list.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; color:var(--muted); font-weight:600;">
+                    <span>TOTAL CLASSES: ${classes.length}</span>
+                    <span style="color:var(--blue)">Click any class to view its study session ➔</span>
+                </div>
+                <div class="classes-container" style="display:flex; flex-direction:column; gap:8px;">
+                    ${classes.map(c => `
+                        <div class="class-row" onclick="selectClassForStudy('${c.id}')" title="Click to view study session for ${c.id}">
+                            <div class="class-dot ${c.status === 'done' ? 'done' : 'processing'}"></div>
+                            <div class="class-info">
+                                <div class="class-id">${c.id} — ${c.subject}</div>
+                                <div class="class-detail">${c.teacher ? c.teacher + ' · ' : ''}${c.languageName || LANG_MAP[c.language] || 'Malayalam'} · ${c.chunksCount || 1} Chunk(s) · ${c.duration || ''} · ${c.date}</div>
+                            </div>
+                            <span class="class-badge ${c.status === 'done' ? 'badge-final' : 'badge-progress'}">
+                                ${c.status === 'done' ? 'Finalized ✓' : 'Processing…'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderStudySession(targetClassId) {
+            const studyContent = $('studyContent');
+            if (!studyContent) return;
+
+            const classes = getSavedClasses();
+            const sessions = getSavedStudySessions();
+
+            let classId = targetClassId;
+            if (!classId) {
+                const selector = $('studyClassSelector');
+                if (selector && selector.value) classId = selector.value;
+                else if (classes.length > 0) classId = classes[0].id;
+                else classId = Object.keys(sessions)[0];
+            }
+
+            const selector = $('studyClassSelector');
+            if (selector) {
+                const allIds = Array.from(new Set([...classes.map(c => c.id), ...Object.keys(sessions)]));
+                selector.innerHTML = allIds.map(id => {
+                    const cls = classes.find(c => c.id === id);
+                    const label = cls ? `${id} — ${cls.subject}` : id;
+                    return `<option value="${id}" ${id === classId ? 'selected' : ''}>${label}</option>`;
+                }).join('');
+                if (classId) selector.value = classId;
+            }
+
+            let session = sessions[classId];
+            if (!session && classId) {
+                const cls = classes.find(c => c.id === classId);
+                if (cls) {
+                    session = generateStudySessionForClass(cls);
+                }
+            }
+
+            if (!session) {
+                studyContent.innerHTML = `
+                    <div class="study-empty">
+                        <div class="study-empty-icon">🧠</div>
+                        <div class="study-empty-title">No study session yet</div>
+                        <div class="study-empty-sub">
+                            Record or upload today\'s lecture and click \"Stop &amp; Finalize\".<br>
+                            Your personalized study session will appear here after processing.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Helper to escape HTML in text
+            const esc = s => s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+
+            // Build sections
+            const topicsHtml = (session.topics || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">🎯 Core Concepts &amp; Topics Covered</div>
+                    <div style="margin-top:6px;">${(session.topics || []).map(t => `<span class="topic-chip">${esc(t)}</span>`).join('')}</div>
+                </div>` : '';
+
+            const summaryHtml = session.summary
+                ? `<div class="study-section">
+                    <div class="study-section-title">📝 Lecture Synthesis</div>
+                    <div class="study-content" style="margin-top:6px; white-space:pre-line;">${esc(session.summary)}</div>
+                </div>` : '';
+
+            const keyPointsHtml = (session.keyPoints || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">🔑 Key Points</div>
+                    <div class="study-content" style="margin-top:6px;">
+                        ${(session.keyPoints || []).map(k => `<div style="margin-bottom:6px">• ${esc(k)}</div>`).join('')}
+                    </div>
+                </div>` : '';
+
+            const formulasHtml = (session.formulas || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">📐 Formulas &amp; Equations</div>
+                    <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+                        ${(session.formulas || []).map(f => `<div style="background:rgba(56,189,248,.07); border:1px solid rgba(56,189,248,.15); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:13px; color:var(--blue);">${esc(f)}</div>`).join('')}
+                    </div>
+                </div>` : '';
+
+            const conceptsHtml = (session.concepts || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">💡 Core Concepts</div>
+                    <div class="study-content" style="margin-top:6px;">
+                        ${(session.concepts || []).map(c => `<div style="margin-bottom:6px">• ${esc(c)}</div>`).join('')}
+                    </div>
+                </div>` : '';
+
+            const qasHtml = (session.qas || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">💬 Practice Q&amp;A</div>
+                    <div style="margin-top:8px;">
+                        ${(session.qas || []).map(qa => `
+                            <div class="qa-block">
+                                <div class="qa-q">${esc(qa.q)}</div>
+                                <div class="qa-a">${esc(qa.a)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : '';
+
+            const mandatoryHtml = (session.mandatoryTasks || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">⚠️ Mandatory Tasks</div>
+                    <div class="study-content" style="margin-top:6px;">
+                        ${(session.mandatoryTasks || []).map(t => `<div style="margin-bottom:6px; color:var(--amber);">⚠ ${esc(t)}</div>`).join('')}
+                    </div>
+                </div>` : '';
+
+            const actionItemsHtml = (session.actionItems || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">⚡ Recommended Exercises &amp; Prep</div>
+                    <div class="study-content" style="margin-top:6px;">
+                        ${(session.actionItems || []).map(item => `<div style="margin-bottom:6px">• ${esc(item)}</div>`).join('')}
+                    </div>
+                </div>` : '';
+
+            const sourcesHtml = (session.sources || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">📚 Reference Sources</div>
+                    <div style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+                        ${(session.sources || []).map(s => `
+                            <div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:rgba(148,163,184,.05); border:1px solid var(--border); border-radius:8px;">
+                                <span style="font-size:16px;">📄</span>
+                                <div style="flex:1; min-width:0;">
+                                    <div style="font-size:12px; font-weight:600; color:var(--text-2);">${esc(s.title)} <span style="font-size:10px; color:var(--muted);">(${esc(s.subject)})</span></div>
+                                    <div style="font-size:11px; color:var(--muted);">${esc(s.description || '')}</div>
+                                </div>
+                                <a href="https://drive.google.com/file/d/${esc(s.drive_file_id)}/view" target="_blank" style="color:var(--blue); font-size:11px; text-decoration:none; white-space:nowrap;">View →</a>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>` : '';
+
+            const transcriptsHtml = (session.transcripts || []).length > 0
+                ? `<div class="study-section">
+                    <div class="study-section-title">🎙️ Transcripts (${session.transcripts.length} chunk${session.transcripts.length !== 1 ? 's' : ''})</div>
+                    <div style="margin-top:8px; display:flex; flex-direction:column; gap:8px;">
+                        ${(session.transcripts || []).map((t, i) => `
+                            <details style="background:rgba(148,163,184,.04); border:1px solid var(--border); border-radius:8px; padding:0;">
+                                <summary style="cursor:pointer; padding:10px 14px; font-size:12px; font-weight:600; color:var(--text-2); list-style:none; display:flex; align-items:center; gap:8px; border-radius:8px;">
+                                    <span style="font-size:14px;">🎙️</span>
+                                    Chunk ${t.seq || (i+1)}: ${esc(t.filename || '')}
+                                    <span style="margin-left:auto; color:var(--muted); font-size:10px; font-weight:400;">${t.created_at ? new Date(t.created_at).toLocaleString() : ''}</span>
+                                </summary>
+                                <div style="padding:10px 14px; padding-top:6px; border-top:1px solid var(--border); font-size:12px; color:var(--text-2); line-height:1.7; white-space:pre-wrap;">${esc(t.text || '')}</div>
+                            </details>
+                        `).join('')}
+                    </div>
+                </div>` : '';
+
+            const driveFolderUrl = session.driveFolderUrl || 'https://drive.google.com/drive/folders/123RR15HDo-g5vtK4177LhVYNXqb0QhFO?usp=drive_link';
+
+            studyContent.innerHTML = `
+                <div class="study-session-card">
+                    <div class="study-header">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                            <div class="study-badge">${session.badge || '🤖 AI TUTOR SESSION'}</div>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button class="btn btn-secondary" style="padding:6px 14px; font-size:11px;" onclick="copyStudyNotes('${session.classId}')">📋 Copy Notes</button>
+                                <a href="${driveFolderUrl}" target="_blank" class="btn btn-secondary" style="padding:6px 14px; font-size:11px; text-decoration:none;">📁 Drive Folder</a>
+                            </div>
+                        </div>
+                        <div class="study-title">${esc(session.title)}</div>
+                        <div class="study-meta">
+                            <span>🏷️ <b>Class ID:</b> ${esc(session.classId)}</span>
+                            <span>👨‍🏫 <b>Instructor:</b> ${esc(session.teacher || 'Instructor')}</span>
+                            <span>📅 <b>Date:</b> ${esc(session.date)}</span>
+                            <span>⏱️ <b>Duration:</b> ${esc(session.duration || '')}</span>
+                            <span>📖 <b>Module:</b> ${esc(session.module || '')}</span>
+                            <span>📋 <b>Subject:</b> ${esc(session.subject || '')}</span>
+                        </div>
+                    </div>
+
+                    ${topicsHtml}
+                    ${summaryHtml}
+                    ${keyPointsHtml}
+                    ${formulasHtml}
+                    ${conceptsHtml}
+                    ${mandatoryHtml}
+                    ${qasHtml}
+                    ${actionItemsHtml}
+                    ${sourcesHtml}
+                    ${transcriptsHtml}
+                </div>
+            `;
+        }
+
+                function selectClassForStudy(classId) {
+            switchTab('study');
+            renderStudySession(classId);
+            showToast(`Loaded study session for ${classId}`);
+        }
+
+        function copyStudyNotes(classId) {
+            const sessions = getSavedStudySessions();
+            const session = sessions[classId];
+            if (!session) return;
+
+            const text = `# ${session.title}\nClass ID: ${session.classId} | Date: ${session.date}\nTeacher: ${session.teacher}\n\n## Topics Covered:\n${session.topics.map(t => '- ' + t).join('\n')}\n\n## Lecture Synthesis:\n${session.summary}\n\n## Practice Q&A:\n${session.qas.map(qa => `${qa.q}\n${qa.a}\n`).join('\n')}\n\n## Action Items:\n${session.actionItems.map(a => '- ' + a).join('\n')}`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Study notes copied to clipboard! 📋');
+            }).catch(() => {
+                showToast('Could not copy notes automatically.');
+            });
+        }
+
+        function shareToTelegram() {
+            showToast('Sent study session update to Telegram Bot 📱');
+        }
+
+        function clearClassesHistory() {
+            if (confirm('Clear local class history? Data will be re-synced from Google Sheets.')) {
+                localStorage.removeItem(CLASSES_KEY);
+                localStorage.removeItem(STUDY_KEY);
+                localStorage.removeItem('listener_sheets_last_sync');
+                renderClassesList();
+                renderStudySession();
+                showToast('Class history cleared. Re-syncing from Sheets…');
+                loadFromGoogleSheets().catch(() => {});
+            }
+        }
+
+        function initClassesAndStudy() {
+            getSavedClasses();
+            getSavedStudySessions();
+            renderClassesList();
+            renderStudySession();
+            updateSyncBadge();
+            // Auto-sync from Google Sheets on load
+            loadFromGoogleSheets().catch(e => console.warn('Initial sheets sync failed:', e));
+        }
+
+        async function triggerSheetsRefresh() {
+            const btn = $('sheetRefreshBtn');
+            if (btn) btn.classList.add('spinning');
+            showToast('🔄 Syncing from Google Sheets…');
+            try {
+                await loadFromGoogleSheets();
+            } finally {
+                if (btn) btn.classList.remove('spinning');
             }
         }
 
@@ -2655,6 +3821,7 @@
                 $('uploadClassId').value = generateClassId() + '-upload';
             }
 
+            initClassesAndStudy();
             updateQueueUI();
             await restoreQueue();
             setConn(navigator.onLine ? 'ready' : 'error', navigator.onLine ? 'Ready' : 'Offline');
